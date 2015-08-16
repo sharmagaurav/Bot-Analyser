@@ -88,6 +88,12 @@
                         <li>
                             <a href="{%url 'readlog.views.index' %}"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                         </li>
+                         <li>
+                            <a href="/readlog/{{last_month}}/good_bot_tables/"><i class="fa fa-dashboard fa-fw"></i> Good Crawlers</a>
+                        </li>
+                        <li>
+                            <a href="/readlog/{{last_month}}/bad_ip_tables/"><i class="fa fa-dashboard fa-fw"></i> Bad bots</a>
+                        </li>
                     </ul>
                 </div>
                 <!-- /.sidebar-collapse -->
@@ -118,6 +124,7 @@
                                             <th>ID</th>
                                             <th>HOST</th>
                                             <th>DESCRIPTION</th>
+                                            <th>HITS</th>
                                             
                                         </tr>
                                     </thead>
@@ -131,6 +138,7 @@
                                                     <td>{{forloop.counter}}</td>
                                                     <td>{{detail.host}}</td>
                                                     <td>{{detail.Description}}</td>
+                                                    <td>{{detail.hits}}</td>
                                                     
                                                 </tr>
                                             {% endfor %}
@@ -143,6 +151,7 @@
                                                     <td>{{forloop.counter}}</td>
                                                     <td>{{detail.host}}</td>
                                                     <td>{{detail.Description}}</td>
+                                                    <td>{{detail.hits}}</td>
                                                     
                                                 </tr>
                                             {% endfor %}
@@ -155,6 +164,7 @@
                                                     <td>{{forloop.counter}}</td>
                                                     <td>{{detail.host}}</td>
                                                     <td>{{detail.Description}}</td>
+                                                    <td>{{detail.hits}}</td>
                                                     
                                                 </tr>
                                             {% endfor %}
@@ -167,6 +177,7 @@
                                                     <td>{{forloop.counter}}</td>
                                                     <td>{{detail.host}}</td>
                                                     <td>{{detail.Description}}</td>
+                                                    <td>{{detail.hits}}</td>
                                                     
                                                 </tr>
                                             {% endfor %}
