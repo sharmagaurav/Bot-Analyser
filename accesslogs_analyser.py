@@ -54,11 +54,11 @@ def preliminary_test():
 	# 	count+=1
 	print len(temp)
 	for i in range(len(temp)):
-		# cursor.execute("SELECT count(*) from readlog_logconfig where host = %s",temp[i][0])
-		# c1 = cursor.fetchall()
-		# hits = c1[0][0]
+		cursor.execute("SELECT count(*) from readlog_logconfig where host = %s",temp[i][0])
+		c1 = cursor.fetchall()
+		hits = c1[0][0]
 		# print i+1, ": ", hits
-		cursor.execute("INSERT INTO readlog_badbotsip (host, Description, date_time) VALUES (%s,%s,%s)",(str(temp[i][0]), description_bad_ip, temp[i][1]))
+		cursor.execute("INSERT INTO readlog_badbotsip (host, Description, date_time, hits) VALUES (%s,%s,%s,%s)",(str(temp[i][0]), description_bad_ip, temp[i][1], hits))
 
 	# for i in range(len(temp2)):
 	# 	cursor.execute("INSERT INTO readlog_goodusers (host, Description, date_time) VALUES (%s,%s,%s)",(str(temp2[i][0]), description_good_ip, temp2[i][1]))
@@ -150,11 +150,13 @@ def excess_requests_in_recent_past():
 			crumb = host_ip
 			suspicious_ip.append(crumb)
 			dts_list.append(y)
+			host_ip_count.append(p1[0][1])
+
 	
 	print "Suspicious ips: ",len(suspicious_ip)
 	for i in range(len(suspicious_ip)):
 		#cursor.execute("INSERT INTO readlog_suspicious (host) VALUES (%s)",(str(suspicious_ip[i])))
-		cursor.execute("INSERT INTO readlog_suspicious (host, Description, date_time) VALUES (%s,%s,%s)",(suspicious_ip[i], "Excess access in one minute", dts_list[i]))
+		cursor.execute("INSERT INTO readlog_suspicious (host, Description, date_time, hits) VALUES (%s,%s,%s,%s)",(suspicious_ip[i], "Excess access in one minute", dts_list[i], host_ip_count[i]))
 
 	conn.commit()
 
@@ -224,7 +226,7 @@ def scrappers():
 		c1 = cursor.fetchall()
 		hits = c1[0][0]
 
-		cursor.execute("INSERT INTO readlog_badbotsip (host, Description, date_time) VALUES (%s,%s,%s)",(ips,des,dts))
+		cursor.execute("INSERT INTO readlog_badbotsip (host, Description, date_time, hits) VALUES (%s,%s,%s,%s)",(ips,des,dts, hits))
 
 	conn.commit()
 	print "Scrappers found"
@@ -253,18 +255,18 @@ def badbot_agents():
 			c1 = cursor.fetchall()
 			hits = c1[0][0]
 
-			cursor.execute("INSERT INTO readlog_badbotsip (host, Description, date_time) VALUES (%s,%s,%s)",(ips,des,dts))
+			cursor.execute("INSERT INTO readlog_badbotsip (host, Description, date_time, hits) VALUES (%s,%s,%s,%s)",(ips,des,dts,hits))
 
 	conn.commit()
 
 def check():
 	start = time.time()
 	print start
-	#preliminary_test()
+	preliminary_test()
 	botAndIp()
-	# scrappers()
-	# badbot_agents()
-	# excess_requests_in_recent_past()
+	scrappers()
+	badbot_agents()
+	excess_requests_in_recent_past()
 	end = time.time()
 	print end - start
 
