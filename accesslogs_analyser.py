@@ -23,134 +23,6 @@ dic = {
 bad_bots  = []
 good_bots = []
 
-class RegexParser(object):
-
-	def __init__(self):
-		self.host            = None #127.0.0.1
-		self.client_id       = None #hyphen -
-		self.user_id         = None #second hyphen -
-		self.date_time       = None	          #Datetime
-		self.method          = None #GET, POST
-		self.endpoint        = None #admin/login/?next=/admin/
-		self.protocol        = None #HTTP/1.1
-		self.response_code   = None #200 status code
-		self.content_size    = None #1305
-		self.user_agents     = None #User agent description
-		self.mobile          = None #Mobile user present or not
-		self.user_agent_flag = None
-
-	def show_data(self):
-		print self.host
-		print self.client_id
-		print self.user_id
-		print self.date_time
-		print self.method
-		print self.endpoint
-		print self.protocol
-		print self.response_code
-		print self.content_size
-		print self.user_agents
-		print self.mobile
-
-	def get_data(self, host, client_id, user_id, date_time,
-				 method, endpoint, protocol, response_code,
-				 content_size, user_agents, mobile, user_agent_flag):
-		self.host            = host #127.0.0.1
-		self.client_id       = client_id #hyphen -
-		self.user_id         = user_id #second hyphen -
-		self.date_time       = date_time	          #Datetime
-		self.method          = method #GET, POST
-		self.endpoint        = endpoint #admin/login/?next=/admin/
-		self.protocol        = protocol #HTTP/1.1
-		self.response_code   = response_code #200 status code
-		self.content_size    = content_size #1305
-		self.user_agents     = user_agents #User agent description
-		self.mobile          = mobile #Mobile user present or not
-		self.user_agent_flag = user_agent_flag
-
-	def parser(self,record):
-		f = open('/home/gaurav/myproject/small.log','r')
-		old_log_pattern = '^\[([\w:/]+\s[+\-]\d{4})\] "(\S+) (\S+)\s*(\S*)\s*" (\d{3}) (\S+) (\S+) (\S+) (.*$)'
-		date_res = "([^:]+):(\d+:\d+:\d+) ([^\]]+)"
-		count = 0
-		text = f.readlines()
-		f.close()
-
-		num_lines = sum(1 for line in open('/home/gaurav/myproject/small.log','r'))
-
-		f = open("/home/gaurav/myproject/small.log",'r')
-		
-		req = record
-		m = re.findall ( 'httpd: (.*?) -', req, re.DOTALL)
-		p = re.findall('- - (.*$)',req,re.DOTALL)
-		
-		try:
-			matchObj = re.match(old_log_pattern,p[0], re.M|re.I)
-		except:
-			count+=1
-		mobile_string = "Mobile"
-		mobile_string_present = 0
-		t = "-"
-		
-		if matchObj:
-			if len(m)==0:
-				pass
-			else:
-				host1          = m[0]
-				client_id2     = t
-				client_id2 = str(client_id2)
-				user_id3       = '-'
-				date_time4     = matchObj.group(1)
-				method5        = matchObj.group(2)
-				endpoint6      = matchObj.group(3)
-				protocol7      = matchObj.group(4)
-				response_code8 = matchObj.group(5)
-				content_size9  = matchObj.group(6)
-				user_agents10  = matchObj.group(8) + " " + matchObj.group(9)
-				user_agent_string = str(user_agents10)
-				quote = '"-"'
-				
-				user_agent_flag = 0
-				if(quote in user_agents10):
-					user_agent_flag = 0
-
-				else:
-					user_agent_flag = 1
-
-				if mobile_string in user_agent_string:
-					mobile_string_present = 1
-				
-				mobile11 = mobile_string_present
-
-				temp = re.match(date_res,date_time4, re.M|re.I)
-				x1 = temp.group(1)
-				x2 = temp.group(2)
-				x3 = temp.group(3)
-				x4 = x1.split('/')
-				x4[1] = dic[x4[1]]
-
-				x5 = x4[1] + " " + x4[0] + " " + x4[2] + " " + x2
-
-				date_time4 = datetime.strptime(x5,'%m %d %Y %H:%M:%S')
-				dates = str(date_time4)
-				mobiles = str(mobile11)
-				flag = str(user_agent_flag)
-
-				self.host            = host1 #127.0.0.1
-				self.client_id       = client_id2 #hyphen -
-				self.user_id         = user_id3 #second hyphen -
-				self.date_time       = date_time4 #Datetime
-				self.method          = method5 #GET, POST
-				self.endpoint        = endpoint6 #admin/login/?next=/admin/
-				self.protocol        = protocol7 #HTTP/1.1
-				self.response_code   = response_code8 #200 status code
-				self.content_size    = content_size9 #1305
-				self.user_agents     = user_agents10 #User agent description
-				self.mobile          = mobile11 #Mobile user present or not
-				self.user_agent_flag = user_agent_flag
-
-		count+=1
-
 
 def preliminary_test():
 	"""
@@ -172,26 +44,28 @@ def preliminary_test():
 		ip = data[count]
 		temp.append(ip)
 		count+=1
-
-	cursor.execute("SELECT distinct(host), date_time from readlog_logconfig  where endpoint like '%ajax%' group by host")
-	data2 = cursor.fetchall()
-	temp2 = []
-	count = 0
-	for row in data2:
-		ip = data2[count]
-		temp2.append(ip)
-		count+=1
-
+	# cursor.execute("SELECT distinct(host), date_time from readlog_logconfig  where endpoint like '%ajax%' group by host")
+	# data2 = cursor.fetchall()
+	# temp2 = []
+	# count = 0
+	# for row in data2:
+	# 	ip = data2[count]
+	# 	temp2.append(ip)
+	# 	count+=1
+	print len(temp)
 	for i in range(len(temp)):
-
+		# cursor.execute("SELECT count(*) from readlog_logconfig where host = %s",temp[i][0])
+		# c1 = cursor.fetchall()
+		# hits = c1[0][0]
+		# print i+1, ": ", hits
 		cursor.execute("INSERT INTO readlog_badbotsip (host, Description, date_time) VALUES (%s,%s,%s)",(str(temp[i][0]), description_bad_ip, temp[i][1]))
 
-	for i in range(len(temp2)):
-		#cursor.execute("INSERT INTO readlog_goodusers (host, Description) VALUES (%s, %s)",(temp2[i], description_good_ip))
-		cursor.execute("INSERT INTO readlog_goodusers (host, Description, date_time) VALUES (%s,%s,%s)",(str(temp2[i][0]), description_good_ip, temp2[i][1]))
+	# for i in range(len(temp2)):
+	# 	cursor.execute("INSERT INTO readlog_goodusers (host, Description, date_time) VALUES (%s,%s,%s)",(str(temp2[i][0]), description_good_ip, temp2[i][1]))
 	local_host = """('127.0.0.1',)"""
 	cursor.execute("delete from readlog_badbotsip where host = %s",(local_host))
 	conn.commit()
+	print "Preliminary test done."
 
 
 def excess_requests_in_recent_past():
@@ -228,7 +102,6 @@ def excess_requests_in_recent_past():
 	for i in range(len(z)):
 		zz.append(z[i][0])
 	
-	# #cursor.execute("SELECT distinct(host) from readlog_logconfig")
 	cursor.execute("SELECT host, count(*) as c from readlog_logconfig group by host order by c desc limit 2000")
 	data = cursor.fetchall()
 	t = set(data)
@@ -238,27 +111,22 @@ def excess_requests_in_recent_past():
 	for i in range(len(w)):
 		s.append(w[i][0])
 
-
-	print xx[0]
-	print yy[0]
-	print zz[0]
-	print s[0]
-
 	ff = set(xx)|set(yy)|set(zz)
-	print len(xx),"+",len(yy),"+",len(zz),"=",len(ff)
+	#print len(xx),"+",len(yy),"+",len(zz),"=",len(ff)
 
 	fff = set(s) & set(ff)
-	print len(fff)
+	#print len(fff)
 
 	ffff = set(s) - set(fff)
 
-	print len(ffff)
+	#print len(ffff)
 
 	distinct_host_list = list(ffff)
-	print distinct_host_list[0]
-	print len(distinct_host_list)
+	#print distinct_host_list[0]
+	print "Distinct hosts : ",len(distinct_host_list)
 
 	suspicious_ip = []
+	host_ip_count = []
 
 	dts_list = []
 	for i in range(len(distinct_host_list)):
@@ -274,29 +142,23 @@ def excess_requests_in_recent_past():
 		dif = pre-sub
 		dif = str(dif)
 		final = p[0] + 	" " + dif
-		# print final
 		
-		#cursor.execute("SELECT host, count(*) as c from readlog_logconfig where host = %s and date_time > %s order by c desc",(host_ip, final))
 		cursor.execute("SELECT host, count(*) as c from readlog_logconfig where host = %s and date_time > %s",(host_ip, final))
 		p1 = cursor.fetchall()
 
-		# print i, "     :    ", p1[0][1]
 		if(p1[0][1]>=20):	
-			#crumb = host_ip  + " " + str(p1[0][1])
 			crumb = host_ip
 			suspicious_ip.append(crumb)
 			dts_list.append(y)
-
 	
-	print len(suspicious_ip)
-	print suspicious_ip[0]
+	print "Suspicious ips: ",len(suspicious_ip)
 	for i in range(len(suspicious_ip)):
 		#cursor.execute("INSERT INTO readlog_suspicious (host) VALUES (%s)",(str(suspicious_ip[i])))
 		cursor.execute("INSERT INTO readlog_suspicious (host, Description, date_time) VALUES (%s,%s,%s)",(suspicious_ip[i], "Excess access in one minute", dts_list[i]))
 
 	conn.commit()
 
-	print "done"
+	print "Excess access done."
 
 
 
@@ -308,31 +170,34 @@ def botAndIp():
 	cursor = conn.cursor()
 
 
-	a=['%rogerbot/1.0%', '%Mozilla/xintellibot%','%Twitterbot%', '%bitlybot%', '%bitlybot/2.0%', '%msnbot%','%bingbot%']
-	b=['209.133.111.215|208.184.81.30|61.194.12.33' , '194.90.251.114|194.90.251.117|194.90.251.115|194.90.251.113|194.90.251.116' , '199.16.156.124|199.16.156.125|199.16.156.126|199.59.148.209|199.59.148.210|199.59.148.211|199.59.149.21|199.59.149.45', '23.21.3.171|54.237.43.151|50.17.151.94|50.17.69.56|107.20.32.80|54.227.49.251|54.198.188.134|54.224.44.111|54.235.40.139|184.72.158.161','54.147.4.25|50.19.1.73|54.242.155.200|184.72.159.8', '65.55|65.54|131.107|157.55|202.96.51','65.52.104|65.52.108|65.55.24|65.55.52|65.55.55|65.55.213|65.55.217|131.253.24|131.253.46|157.55.16|157.55.18|157.55.32|157.55.36|157.55.48|157.55.109|157.55.110|157.55.110|157.56.92|157.56.93|157.56.94|157.56.229|199.30.16|207.46.12.|207.46.192|207.46.195|207.46.199|207.46.204|157.55.39']
+	a=['%googlebot%','%rogerbot/1.0%', '%Mozilla/xintellibot%','%Twitterbot%', '%bitlybot%', '%bitlybot/2.0%', '%msnbot%','%bingbot%']
+	b=['66.249.6','209.133.111.215|208.184.81.30|61.194.12.33' , '194.90.251.114|194.90.251.117|194.90.251.115|194.90.251.113|194.90.251.116' , '149.154.167|199.16.156.124|199.16.156.125|199.16.156.126|199.59.148.209|199.59.148.210|199.59.148.211|199.59.149.21|199.59.149.45', '23.21.3.171|54.237.43.151|50.17.151.94|50.17.69.56|107.20.32.80|54.227.49.251|54.198.188.134|54.224.44.111|54.235.40.139|184.72.158.161','54.147.4.25|50.19.1.73|54.242.155.200|184.72.159.8', '65.55|65.54|131.107|157.55|202.96.51|199.30.17','65.52.104|65.52.108|65.55.24|65.55.52|65.55.55|65.55.213|65.55.217|131.253.24|131.253.46|157.55.16|157.55.18|157.55.32|157.55.36|157.55.48|157.55.109|157.55.110|157.55.110|157.56.92|157.56.93|157.56.94|157.56.229|199.30.16|207.46.12.|207.46.192|207.46.195|207.46.199|207.46.204|157.55.39|207.46.13']
 	length = len(a)
 
-	print length
-	desc=['rogerbot/1.0','Mozilla/xintellibot','Twitterbot', 'bitlybot', 'bitlybot/2.0','msnbot','bingbot']
+	desc=['googlebot','rogerbot/1.0','Mozilla/xintellibot','Twitterbot', 'bitlybot', 'bitlybot/2.0','msnbot','bingbot']
 	count = 0
 	
 	for i in range(length):
 		temp = []
-		cursor.execute("select distinct(host), date_time from readlog_logconfig where user_agents like %s and host REGEXP %s group by host",(a[i],b[i]))
+		hitslist = []
+		cursor.execute("select distinct(host), date_time, count(*) from readlog_logconfig where user_agents like %s and host REGEXP %s group by host",(a[i],b[i]))
 		data= cursor.fetchall()
 		date_list = []
-		print len(data)
+		print a[i]," : ",len(data)
 		
 		for x  in range(len(data)):
 			temp.append(data[x][0])
 			date_list.append(data[x][1])
+			hitslist.append(data[x][2])
 		
 		for i in range(len(temp)):
-			cursor.execute("INSERT INTO readlog_goodbots (host, Description, date_time) VALUES (%s,%s,%s)",(temp[i], desc[count], date_list[i]))
+
+			cursor.execute("INSERT INTO readlog_goodbots (host, Description, date_time, hits) VALUES (%s,%s,%s,%s)",(temp[i], desc[count], date_list[i], hitslist[i]))
 
 		count+=1
 
 	conn.commit()
+	print "Good bots done"
 
 def scrappers():
 
@@ -345,8 +210,6 @@ def scrappers():
 	a1='Offline Explorer|SiteSnagger|WebCopier|WebReaper|WebStripper|WebZIP|TeleportPro|Xaldon_WebSpider'
 	a = 'Offline Explorer'	
 	
-
-
 	cursor.execute("select distinct(host), user_agents, date_time from readlog_logconfig where user_agents REGEXP %s group by host",(a))
 	data= cursor.fetchall()
 	
@@ -356,9 +219,15 @@ def scrappers():
 		dts = data[i][2]
 		des = scr + " Scrapper"
 
+
+		cursor.execute("SELECT count(*) from readlog_logconfig where host = %s",ips)
+		c1 = cursor.fetchall()
+		hits = c1[0][0]
+
 		cursor.execute("INSERT INTO readlog_badbotsip (host, Description, date_time) VALUES (%s,%s,%s)",(ips,des,dts))
 
 	conn.commit()
+	print "Scrappers found"
 
 def badbot_agents():
 
@@ -373,25 +242,31 @@ def badbot_agents():
 		cursor.execute("select distinct(host), date_time from readlog_logconfig where user_agents REGEXP %s group by host",(b[i]))
 		data= cursor.fetchall()
 		
-		print len(data), '\n'
+		print len(data)
 		for x in range(len(data)):
 			ips = str(data[x][0])
 			scr = b[i]
 			dts = data[x][1]
 			des = str(scr) + " Bot"
 
-			cursor.execute("INSERT INTO readlog_badbotsip (host, Description, date_time) VALUES (%s,%s,%s)",(ips,des,dts))
+			cursor.execute("SELECT count(*) from readlog_logconfig where host = %s",ips)
+			c1 = cursor.fetchall()
+			hits = c1[0][0]
 
+			cursor.execute("INSERT INTO readlog_badbotsip (host, Description, date_time) VALUES (%s,%s,%s)",(ips,des,dts))
 
 	conn.commit()
 
 def check():
-	preliminary_test()
+	start = time.time()
+	print start
+	#preliminary_test()
 	botAndIp()
-	scrappers()
-	badbot_agents()
-	excess_requests_in_recent_past()
-	
+	# scrappers()
+	# badbot_agents()
+	# excess_requests_in_recent_past()
+	end = time.time()
+	print end - start
 
 if __name__ == '__main__':
 	check()
