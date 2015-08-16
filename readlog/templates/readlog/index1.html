@@ -33,7 +33,13 @@
 
 
 
-
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $.plot($("#flot-pie-chart"),
+                   data, 
+                   options);
+        });
+    </script>
 
 
 
@@ -91,6 +97,12 @@
                     <ul class="nav" id="side-menu">
                         <li>
                             <a href="{%url 'readlog.views.index' %}"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+                        </li>
+                        <li>
+                            <a href="/readlog/{{last_month}}/good_bot_tables/"><i class="fa fa-dashboard fa-fw"></i> Good Crawlers</a>
+                        </li>
+                        <li>
+                            <a href="/readlog/{{last_month}}/bad_ip_tables/"><i class="fa fa-dashboard fa-fw"></i> Bad bots</a>
                         </li>
                     </ul>
                 </div>
@@ -229,6 +241,7 @@
                         </a>
                     </div>
                 </div>
+
                 <div class="col-lg-3 col-md-6">
                     <div class="panel panel-green">
                         <div class="panel-heading">
@@ -477,9 +490,18 @@
                         </a>
                     </div>
                 </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <div class="panel-body">
+                        <div class="flot-chart">
+                            <div class="flot-chart-content" id="flot-pie-chart"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
                 
                         <div class="panel-footer">
+
                             <div class="input-group">
                                 
                             </div>
@@ -491,6 +513,7 @@
                 <!-- /.col-lg-4 -->
             </div>
             <!-- /.row -->
+
 
 
         </div>
@@ -513,9 +536,17 @@
     <script src="{% static 'readlog/bower_components/datatables/media/js/jquery.dataTables.min.js' %}"></script>
     <script src="{% static 'readlog/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js' %}"></script>
 
+    <!-- Flot Charts JavaScript -->
+    <script src="{% static 'readlog/bower_components/flot/excanvas.min.js' %}"></script>
+    <script src="{% static 'readlog/bower_components/flot/jquery.flot.js' %}"></script>
+    <script src="{% static 'readlog/bower_components/flot/jquery.flot.pie.js' %}"></script>
+    <script src="{% static 'readlog/bower_components/flot/jquery.flot.resize.js' %}"></script>
+    <script src="{% static 'readlog/bower_components/flot/jquery.flot.time.js' %}"></script>
+    <script src="{% static 'readlog/bower_components/flot.tooltip/js/jquery.flot.tooltip.min.js' %}"></script>
+
     <!-- Custom Theme JavaScript -->
     <script src="{%static 'readlog/dist/js/sb-admin-2.js' %}"></script>
-    <script src="../js/morris-data.js"></script>
+    <script src="{%static 'readlog/js/morris-data.js' %}"></script>
 
     <!-- Custom Theme JavaScript -->
     <script src="../dist/js/sb-admin-2.js"></script>
