@@ -10,10 +10,12 @@ from .models import BadBotsIp, GoodBots, GoodUsers, Suspicious, LogConfig
 from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
 from django.contrib import auth
+from django.db.models import Count
 
 #primary variables for data query
-today = datetime.now()
+#today = datetime.now()
 #today = date.today()- timedelta(days=10)
+today = datetime.strptime("2015-08-16 01:01:01", '%Y-%m-%d %H:%M:%S')
 today = datetime.strftime(today, '%Y-%m-%d %H:%M:%S')
 today = datetime.strptime(today, '%Y-%m-%d %H:%M:%S')
 date_today_str = datetime.strftime(today, '%Y-%m-%d')
@@ -108,11 +110,15 @@ def index(request):
 
 def good_bot_tables(request,question_id):
 	good_ip = GoodBots.objects.all()
-	good_ip_yesterday = GoodBots.objects.filter(date_time__gt=date_time_yesterday)
-	good_ip_last_week = GoodBots.objects.filter(date_time__gt=last_week_date)
-	good_ip_last_hour = GoodBots.objects.filter(date_time__gt=date_time_last_hour)
-	good_ip_last_month = GoodBots.objects.filter(date_time__gt=last_month_date)
+	good_ip_yesterday = GoodBots.objects.filter(date_time__gt=date_time_yesterday).order_by('-hits')
+	good_ip_last_week = GoodBots.objects.filter(date_time__gt=last_week_date).order_by('-hits')
+	good_ip_last_hour = GoodBots.objects.filter(date_time__gt=date_time_last_hour).order_by('-hits')
+	good_ip_last_month = GoodBots.objects.filter(date_time__gt=last_month_date).order_by('-hits')
 
+	last_hour = 1
+	yesterday = 2
+	last_week = 3
+	last_month= 4
 	template = loader.get_template('readlog/good_bot_table.html')
 	context = RequestContext(request,{
 		'good_ip': good_ip,
@@ -121,17 +127,25 @@ def good_bot_tables(request,question_id):
 		'good_ip_last_month': good_ip_last_month,
 		'good_ip_last_week': good_ip_last_week,
 		'good_ip_last_hour': good_ip_last_hour,
+		'last_hour' : last_hour,
+		'yesterday': yesterday,
+		'last_week': last_week,
+		'last_month': last_month,
 
 		})
 	return HttpResponse(template.render(context))
 
 def good_user_tables(request,question_id):
 	good_user = GoodUsers.objects.order_by('id')[:1000]
-	good_user_last_month = GoodUsers.objects.filter(date_time__gt=last_month_date)[:1000]
-	good_user_last_hour = GoodUsers.objects.filter(date_time__gt=date_time_last_hour)[:1000]
-	good_user_last_week = GoodUsers.objects.filter(date_time__gt=last_week_date)[:1000]
-	good_user_yesterday = GoodUsers.objects.filter(date_time__gt=date_time_yesterday)[:1000]
+	good_user_last_month = GoodUsers.objects.filter(date_time__gt=last_month_date).order_by('-hits')[:1000]
+	good_user_last_hour = GoodUsers.objects.filter(date_time__gt=date_time_last_hour).order_by('-hits')[:1000]
+	good_user_last_week = GoodUsers.objects.filter(date_time__gt=last_week_date).order_by('-hits')[:1000]
+	good_user_yesterday = GoodUsers.objects.filter(date_time__gt=date_time_yesterday).order_by('-hits')[:1000]
 
+	last_hour = 1
+	yesterday = 2
+	last_week = 3
+	last_month= 4
 	template = loader.get_template('readlog/good_user_table.html')
 	context = RequestContext(request,{
 		'good_user': good_user,
@@ -140,17 +154,25 @@ def good_user_tables(request,question_id):
 		'good_user_last_hour': good_user_last_hour,
 		'good_user_last_week': good_user_last_week,
 		'good_user_yesterday': good_user_yesterday,
+		'last_hour' : last_hour,
+		'yesterday': yesterday,
+		'last_week': last_week,
+		'last_month': last_month,
 
 		})
 	return HttpResponse(template.render(context))
 
 def bad_ip_tables(request,question_id):
 	bad_ip = BadBotsIp.objects.all()
-	bad_ip_yesterday = BadBotsIp.objects.filter(date_time__gt=date_time_yesterday)
-	bad_ip_last_hour = BadBotsIp.objects.filter(date_time__gt=date_time_last_hour)
-	bad_ip_last_week = BadBotsIp.objects.filter(date_time__gt=last_week_date)
-	bad_ip_last_month = BadBotsIp.objects.filter(date_time__gt=last_month_date)
+	bad_ip_yesterday = BadBotsIp.objects.filter(date_time__gt=date_time_yesterday).order_by('-hits')
+	bad_ip_last_hour = BadBotsIp.objects.filter(date_time__gt=date_time_last_hour).order_by('-hits')
+	bad_ip_last_week = BadBotsIp.objects.filter(date_time__gt=last_week_date).order_by('-hits')
+	bad_ip_last_month = BadBotsIp.objects.filter(date_time__gt=last_month_date).order_by('-hits')
 
+	last_hour = 1
+	yesterday = 2
+	last_week = 3
+	last_month= 4
 	template = loader.get_template('readlog/bad_ip_tables.html')
 	context = RequestContext(request,{
 		'bad_ip': bad_ip,
@@ -159,17 +181,25 @@ def bad_ip_tables(request,question_id):
 		'bad_ip_last_hour': bad_ip_last_hour,
 		'bad_ip_last_week': bad_ip_last_week,
 		'bad_ip_last_month': bad_ip_last_month,
+		'last_hour' : last_hour,
+		'yesterday': yesterday,
+		'last_week': last_week,
+		'last_month': last_month,
 
 		})
 	return HttpResponse(template.render(context))
 
 def suspicious_ip_tables(request,question_id):
 	suspicious_ip = Suspicious.objects.order_by('id')
-	suspicious_ip_yesterday = Suspicious.objects.filter(date_time__gt=date_time_yesterday)
-	suspicious_ip_last_hour = Suspicious.objects.filter(date_time__gt=date_time_last_hour)
-	suspicious_ip_last_week = Suspicious.objects.filter(date_time__gt=last_week_date)
-	suspicious_ip_last_month = Suspicious.objects.filter(date_time__gt=last_month_date)
+	suspicious_ip_yesterday = Suspicious.objects.filter(date_time__gt=date_time_yesterday).order_by('-hits')
+	suspicious_ip_last_hour = Suspicious.objects.filter(date_time__gt=date_time_last_hour).order_by('-hits')
+	suspicious_ip_last_week = Suspicious.objects.filter(date_time__gt=last_week_date).order_by('-hits')
+	suspicious_ip_last_month = Suspicious.objects.filter(date_time__gt=last_month_date).order_by('-hits')
 
+	last_hour = 1
+	yesterday = 2
+	last_week = 3
+	last_month= 4
 	template = loader.get_template('readlog/suspicious_ip_tables.html')
 	context = RequestContext(request,{
 		'suspicious_ip': suspicious_ip,
@@ -178,6 +208,10 @@ def suspicious_ip_tables(request,question_id):
 		'suspicious_ip_last_hour': suspicious_ip_last_hour,
 		'suspicious_ip_last_week': suspicious_ip_last_week,
 		'suspicious_ip_last_month': suspicious_ip_last_month,
+		'last_hour' : last_hour,
+		'yesterday': yesterday,
+		'last_week': last_week,
+		'last_month': last_month,
 
 		})
 	return HttpResponse(template.render(context))
@@ -208,6 +242,27 @@ def logins(request):
 		})
 	return HttpResponse(template.render(context))
 
+
+def bad_ip_details(request, question_id, host_id):
+	bad_ip = BadBotsIp.objects.filter(id=host_id)
+	
+	template = loader.get_template('readlog/login.html')
+	last_hour = 1
+	yesterday = 2
+	last_week = 3
+	last_month= 4
+	template = loader.get_template('readlog/bad_ip_details.html')
+	context = RequestContext(request,{
+		'bad_ip' : bad_ip,
+		'question_id' : question_id,
+		'host_id' : host_id,
+		'last_hour' : last_hour,
+		'yesterday': yesterday,
+		'last_week': last_week,
+		'last_month': last_month,
+
+		})
+	return HttpResponse(template.render(context))
 
 @csrf_exempt
 def x(request):

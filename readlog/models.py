@@ -21,26 +21,31 @@ class BadBotsIp(models.Model):
 	host             = models.CharField(max_length=100) #127.0.0.1
 	Description      = models.CharField(max_length=256, default="")
 	date_time        = models.DateTimeField(default="1900-01-01 00:00:00")	          #Datetime
+	hits             = models.IntegerField(default=0)
 
 class GoodBots(models.Model):
 	host             = models.CharField(max_length=100) #127.0.0.1
 	Description      = models.CharField(max_length=256,default="")
 	date_time        = models.DateTimeField(default="1900-01-01 00:00:00")	          #Datetime
+	hits             = models.IntegerField(default=0)
 
 class GoodUsers(models.Model):
 	host             = models.CharField(max_length=100) #127.0.0.1
 	Description      = models.CharField(max_length=256,default="")
 	date_time        = models.DateTimeField(default="1900-01-01 00:00:00")	          #Datetime
+	hits             = models.IntegerField(default=0)
 
 class Suspicious(models.Model):
 	host             = models.CharField(max_length=100) #127.0.0.1
 	Description      = models.CharField(max_length=256,default="")
 	date_time        = models.DateTimeField(default="1900-01-01 00:00:00")	          #Datetime
+	hits             = models.IntegerField(default=0)
 
 class Unknown(models.Model):
 	host             = models.CharField(max_length=100) #127.0.0.1
 	Description      = models.CharField(max_length=256,default="")
 	date_time        = models.DateTimeField(default="1900-01-01 00:00:00")	          #Datetime
+	hits             = models.IntegerField(default=0)
 	
 class Rules(models.Model):
 	Description      = models.CharField(max_length=256,default="")
