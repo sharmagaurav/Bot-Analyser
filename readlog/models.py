@@ -15,6 +15,7 @@ class LogConfig(models.Model):
 	user_agents      = models.CharField(max_length=256, default="") #user agent with header
 	mobile           = models.IntegerField(default=0)
 	user_agents_flag = models.IntegerField(default=0)
+	section          = models.CharField(max_length=256, default="")
 
 
 class BadBotsIp(models.Model):

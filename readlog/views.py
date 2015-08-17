@@ -248,6 +248,7 @@ def bad_ip_details(request, question_id, host_id):
 	host_name = BadBotsIp.objects.filter(id=host_id).values('host')
 	host_data = LogConfig.objects.all().filter(host=host_name).values('endpoint').annotate(total = Count('endpoint')).order_by('-total')[:5]
 	user_agent_data = LogConfig.objects.all().filter(host=host_name).values('user_agents').annotate(total = Count('user_agents')).order_by('-total')[:5]
+	section_data = LogConfig.objects.all().filter(host=host_name).values('section').annotate(total = Count('section')).order_by('-total')[:5]
 	template = loader.get_template('readlog/login.html')
 	last_hour = 1
 	yesterday = 2
@@ -255,6 +256,7 @@ def bad_ip_details(request, question_id, host_id):
 	last_month= 4
 	template = loader.get_template('readlog/bad_ip_details.html')
 	context = RequestContext(request,{
+		'section_data' : section_data,
 		'user_agent_data' : user_agent_data,
 		'host_data' : host_data,
 		'bad_ip' : bad_ip,

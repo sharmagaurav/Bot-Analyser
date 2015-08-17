@@ -21,15 +21,11 @@ dic = {
 	'Sep': '09',
 }
 
-def over_write_files():
-	f = open('/home/gaurav/myproject/readlog/testlogs.txt','w')
-	f.write("")
-	f.close()
 
 def bulk_insert_logs_2(host_list,client_id_list,user_id_list,
 			date_time_list,method_list,endpoint_list,protocol_list,
 			response_code_list,content_size_list,user_agents_list,
-			mobile_list,user_agent_flag_list,left):
+			mobile_list,user_agent_flag_list,section_list,left):
 	
 	conn = MySQLdb.connect(host = "localhost", user = "root",
 							passwd = "1234", db = "logparsers")
@@ -37,7 +33,7 @@ def bulk_insert_logs_2(host_list,client_id_list,user_id_list,
 	cursor = conn.cursor()
 	try:
 		for i in range(left):
-			cursor.execute("INSERT INTO readlog_logconfig (host,client_id,user_id,date_time,method,endpoint,protocol,response_code,content_size,user_agents,mobile,user_agents_flag) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", (host_list[i],client_id_list[i],user_id_list[i],date_time_list[i],method_list[i],endpoint_list[i],protocol_list[i], response_code_list[i], content_size_list[i], user_agents_list[i], mobile_list[i], user_agent_flag_list[i]))
+			cursor.execute("INSERT INTO readlog_logconfig (host,client_id,user_id,date_time,method,endpoint,protocol,response_code,content_size,user_agents,mobile,user_agents_flag,section) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", (host_list[i],client_id_list[i],user_id_list[i],date_time_list[i],method_list[i],endpoint_list[i],protocol_list[i], response_code_list[i], content_size_list[i], user_agents_list[i], mobile_list[i], user_agent_flag_list[i], section_list[i]))
 	except:
 		pass
 	conn.commit()
@@ -46,15 +42,15 @@ def bulk_insert_logs_2(host_list,client_id_list,user_id_list,
 def bulk_insert_logs(host_list,client_id_list,user_id_list,
 			date_time_list,method_list,endpoint_list,protocol_list,
 			response_code_list,content_size_list,user_agents_list,
-			mobile_list,user_agent_flag_list):
+			mobile_list,user_agent_flag_list,section_list):
 	
 	conn = MySQLdb.connect(host = "localhost", user = "root",
 							passwd = "1234", db = "logparsers")
 
 	cursor = conn.cursor()
 	try:
-		for i in range(8000):
-			cursor.execute("INSERT INTO readlog_logconfig (host,client_id,user_id,date_time,method,endpoint,protocol,response_code,content_size,user_agents,mobile,user_agents_flag) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", (host_list[i],client_id_list[i],user_id_list[i],date_time_list[i],method_list[i],endpoint_list[i],protocol_list[i], response_code_list[i], content_size_list[i], user_agents_list[i], mobile_list[i], user_agent_flag_list[i]))
+		for i in range(5000):
+			cursor.execute("INSERT INTO readlog_logconfig (host,client_id,user_id,date_time,method,endpoint,protocol,response_code,content_size,user_agents,mobile,user_agents_flag,section) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", (host_list[i],client_id_list[i],user_id_list[i],date_time_list[i],method_list[i],endpoint_list[i],protocol_list[i], response_code_list[i], content_size_list[i], user_agents_list[i], mobile_list[i], user_agent_flag_list[i], section_list[i]))
 	except:
 		pass
 	conn.commit()
@@ -89,6 +85,7 @@ def get_old_access_logs():
 				user_agents_list       = []
 				mobile_list            = []
 				user_agent_flag_list   = []
+				section_list           = []
 
 
 				#f = open("/home/gaurav/myproject/readlog/testlogs.txt",'a')
@@ -124,7 +121,12 @@ def get_old_access_logs():
 							protocol7      = matchObj.group(4)
 							response_code8 = matchObj.group(5)
 							content_size9  = matchObj.group(6)
-							user_agents10  = matchObj.group(8) + " " + matchObj.group(9)
+							h = matchObj.group(9)
+							m = h.split('"')
+							user_agents10  = matchObj.group(8) + " " + m[0]
+							if ('"-"' in user_agents10):
+								user_agents10 = '-'
+								print user_agents10
 							user_agent_string = str(user_agents10)
 							
 							user_agent_flag = 0
@@ -135,6 +137,8 @@ def get_old_access_logs():
 								mobile_string_present = 1
 							
 							mobile11 = mobile_string_present
+							temp_section = endpoint6.split('/')
+							section11 = "/" + temp_section[1] + "/"
 
 							temp = re.match(date_res,date_time4, re.M|re.I)
 							x1 = temp.group(1)
@@ -164,12 +168,13 @@ def get_old_access_logs():
 							user_agents_list.append(user_agents10)
 							mobile_list.append(mobile11)
 							user_agent_flag_list.append(user_agent_flag)
+							section_list.append(section11)
 
-							if((count+1)%8000==0):
+							if((count+1)%5000==0):
 								bulk_insert_logs(host_list,client_id_list,user_id_list,
 						date_time_list,method_list,endpoint_list,protocol_list,
 						response_code_list,content_size_list,user_agents_list,
-						mobile_list,user_agent_flag_list)
+						mobile_list,user_agent_flag_list,section_list)
 								host_list              = []
 								client_id_list         = []
 								user_id_list           = []
@@ -182,21 +187,21 @@ def get_old_access_logs():
 								user_agents_list       = []
 								mobile_list            = []
 								user_agent_flag_list   = []
+								section_list           = []
 				
 
 					#f.write(line_to_parse)
 					count+=1
 
-				left = num_lines%8000
+				left = num_lines%5000
 				bulk_insert_logs_2(host_list,client_id_list,user_id_list,
 					date_time_list,method_list,endpoint_list,protocol_list,
 					response_code_list,content_size_list,user_agents_list,
-					mobile_list,user_agent_flag_list,left)
+					mobile_list,user_agent_flag_list,section_list,left)
 
 				print "done"
 				f.close()
 
 if __name__ == '__main__':
 
-	over_write_files()
 	get_old_access_logs()
