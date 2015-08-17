@@ -163,13 +163,13 @@
                                     <thead>
                                         <tr>
                                             <th>#</th>
-                                            <th>First Name</th>
-                                            <th>Last Name</th>
-                                            <th>Username</th>
+                                            <th>Date</th>
+                                            <th>Hits</th>
+                                            
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
+                                        <!-- <tr>
                                             <td>1</td>
                                             <td>Mark</td>
                                             <td>Otto</td>
@@ -198,7 +198,17 @@
                                             <td>Larry</td>
                                             <td>the Bird</td>
                                             <td>@twitter</td>
+                                        </tr> -->
+                                        <tr>
+                                            {% for detail in peak_activity %}
+                                            <tr>
+                                                <td>{{forloop.counter}}</td>
+                                                <td>{{detail.hour}}</td>
+                                                <td>{{detail.total}}</td>
+                                            </tr>
+                                            {% endfor %}
                                         </tr>
+
                                     </tbody>
                                 </table>
                             </div>

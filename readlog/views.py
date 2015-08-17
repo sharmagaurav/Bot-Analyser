@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
 from django.contrib import auth
 from django.db.models import Count
+from django.db import connections
 
 #primary variables for data query
 #today = datetime.now()
@@ -249,6 +250,8 @@ def bad_ip_details(request, question_id, host_id):
 	host_data = LogConfig.objects.all().filter(host=host_name).values('endpoint').annotate(total = Count('endpoint')).order_by('-total')[:5]
 	user_agent_data = LogConfig.objects.all().filter(host=host_name).values('user_agents').annotate(total = Count('user_agents')).order_by('-total')[:5]
 	section_data = LogConfig.objects.all().filter(host=host_name).values('section').annotate(total = Count('section')).order_by('-total')[:5]
+	peak_activity = LogConfig.objects.extra(select={'hour': connections[LogConfig.objects.db].ops.date_trunc_sql('hour', 'date_time')}).filter(host=host_name).values('hour').annotate(total = Count('date_time')).order_by('-total')[:5]
+	
 	template = loader.get_template('readlog/login.html')
 	last_hour = 1
 	yesterday = 2
@@ -256,6 +259,7 @@ def bad_ip_details(request, question_id, host_id):
 	last_month= 4
 	template = loader.get_template('readlog/bad_ip_details.html')
 	context = RequestContext(request,{
+		'peak_activity' : peak_activity,
 		'section_data' : section_data,
 		'user_agent_data' : user_agent_data,
 		'host_data' : host_data,
