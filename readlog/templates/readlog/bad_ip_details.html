@@ -51,7 +51,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="index.html">SB Admin v2.0</a>
+                <a class="navbar-brand" href="index.html">Bots Analyser</a>
             </div>
             <!-- /.navbar-header -->
 
@@ -268,13 +268,12 @@
                                     <thead>
                                         <tr>
                                             <th>#</th>
-                                            <th>First Name</th>
-                                            <th>Last Name</th>
-                                            <th>Username</th>
+                                            <th>Endpoint</th>
+                                            <th>Hits</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
+                                        <!-- <tr>
                                             <td>1</td>
                                             <td>Mark</td>
                                             <td>Otto</td>
@@ -291,7 +290,14 @@
                                             <td>Larry</td>
                                             <td>the Bird</td>
                                             <td>@twitter</td>
+                                        </tr> -->
+                                        {% for detail in host_data %}
+                                        <tr>
+                                            <td>{{forloop.counter}}</td>
+                                            <td>{{detail.endpoint}}</td>
+                                            <td>{{detail.total}}</td>
                                         </tr>
+                                        {% endfor %}
                                     </tbody>
                                 </table>
                             </div>
