@@ -32,7 +32,7 @@ def preliminary_test():
 	conn = MySQLdb.connect(host = "localhost", user = "root",
                             passwd = "1234", db = "logparsers")
 	cursor = conn.cursor()
-	p = '%"-"%'
+	p = "-"
 	description_bad_ip = 'Empty user agent'
 	description_good_ip = 'Ajax requests'
 	cursor.execute("SELECT distinct(host), date_time from readlog_logconfig  where user_agents like %s group by host",(p))
