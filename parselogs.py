@@ -138,7 +138,10 @@ def get_old_access_logs():
 							
 							mobile11 = mobile_string_present
 							temp_section = endpoint6.split('/')
-							section11 = "/" + temp_section[1] + "/"
+							if(temp_section[1] == ''):
+								section11 = "/" + temp_section[1]
+							else:
+								section11 = "/" + temp_section[1] + "/"
 
 							temp = re.match(date_res,date_time4, re.M|re.I)
 							x1 = temp.group(1)
