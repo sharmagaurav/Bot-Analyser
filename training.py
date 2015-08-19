@@ -25,8 +25,6 @@ centroid_avg_time_between_two_requests_bad = None
 centroid_avg_time_between_two_requests_good = None
 centroid_avg_time_between_two_requests_suspicious = None
 
-
-
 def total_hits_param():
 
 	conn = MySQLdb.connect(host = "localhost", user = "root",
