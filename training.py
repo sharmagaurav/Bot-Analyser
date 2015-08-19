@@ -97,27 +97,17 @@ def session_dis():
 		for i in range(len(host_list)):
 			sessions_list = [0]*len(host_list)
 			session_time = max_date[i] - min_date[i]
-			session_time_string = str(session_time)
-			t = max_date[i]
-			t = datetime.strftime(t, "%Y-%m-%d")
-			standard_session_time = t + " 00:30:00"
-			session_time_full = t + " " + session_time_string
-			standard_session_time = datetime.strptime(standard_session_time, "%Y-%m-%d %H:%M:%S")
-			session_time_full = datetime.strptime(session_time_full, "%Y-%m-%d %H:%M:%S")
+			s = session_time.seconds
 
-			if(session_time_full<standard_session_time):
-				pt = session_time_full
-				total_seconds = pt.second+pt.minute*60+pt.hour*3600
+			if(s<1800):
+				total_seconds = s
 				if(total_seconds==0):
 					total_seconds = 1
 				sessions_list[i] = 1
 				avg_time_per_session[i] = total_seconds
 				avg_hits_per_session[i] = host_hits_list[i]
 				avg_time_between_two_requests[i] = float(total_seconds)/float(host_hits_list[i])
-				#print session_time_full," ", total_seconds, " ", host_hits_list[i], " ", avg_time_between_two_requests[i]
-				# centroid_avg_time_between_two_requests_bad = sumss/len(avg_time_between_two_requests)
-				# centroid_avg_session_hits_bad = sumhh/len(avg_hits_per_session)
-				# centroid_avg_time_per_session_bad = sumtt/len(avg_time_per_session)
+
 			else:
 				requests = []
 				time_between_request_in_one_session = []
@@ -134,8 +124,7 @@ def session_dis():
 				time_per_session = []
 				for n in range(len(requests)-1):
 					diff = requests[n]-requests[m]
-					# print requests[m]," - ",requests[n]," = ", diff
-					# print "Diff ",requests[m], " - ", requests[n], " = " ,diff
+					
 					try:
 						diff = datetime.strptime(str(diff), '%H:%M:%S')
 					except:
@@ -387,7 +376,6 @@ def avg_section_hits():
 
 if __name__ == '__main__':
 	total_hits_param()
-	# sessiondiscovery()
 	avg_section_hits()
 	session_dis()
 	print "TOTAL HITS"
