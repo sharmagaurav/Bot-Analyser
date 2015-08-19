@@ -43,9 +43,8 @@ def feature1():
 		# print data[0][0]
 		feature1_list.append(data[0][0])
 	
-	# l= len(feature1_list)
-	# print l
-	print feature1_list
+	
+	# print feature1_list
 	conn.commit()
 
 
@@ -56,8 +55,7 @@ def feature2():
 	cursor = conn.cursor()
 
 	m = len(host_list)
-	print m
-	
+		
 	for i in range(m):	
 		cursor.execute("SELECT count(*) as c, section from readlog_logconfig_test WHERE host = %s group by section having c > 5",(host_list[i]))
 		data = cursor.fetchall()
@@ -68,13 +66,19 @@ def feature2():
 	
 	conn.commit()
 
-insert_db():
+def insert_db():
 
+	print "entered db"
 	conn = MySQLdb.connect(host = "localhost", user = "root",
                             passwd = "1234", db = "logparsers")
 	cursor = conn.cursor()
+	l=len(host_list)
 
+	for i in range(l):
 
+		# RUN THIS COMMNTD QUERY WHEN BAAKI TEENO LIST ARE COMPLETE. TRUNCATE TABLE SIDE BY SIDE
+		# cursor.execute("INSERT INTO readlog_feature_vector (host,no_of_requests,no_of_sections,avg_session_time,hits_per_session,time_bw_requests) VALUES (%s,%s,%s,%s,%s,%s)", (host_list[i],feature1_list[i],feature2_list[i],feature3_list[i],feature4_list[i],feature5_list[i]))	
+		cursor.execute("INSERT INTO readlog_feature_vector (host,no_of_requests,no_of_sections) VALUES (%s,%s,%s)", (host_list[i],feature1_list[i],feature2_list[i]))	
 	
 	conn.commit()
 
