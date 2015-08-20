@@ -58,6 +58,7 @@ class Feature_vector(models.Model):
 	avg_session_time = models.FloatField(default=0)
 	hits_per_session = models.FloatField(default=0)
 	time_bw_requests = models.FloatField(default=0)
+	sessions_per_day = models.FloatField(default=0)
 
 
 class LogConfig_test(models.Model):
