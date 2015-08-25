@@ -44,7 +44,7 @@ def preliminary_test():
 		ip = data[count]
 		temp.append(ip)
 		count+=1
-	# cursor.execute("SELECT distinct(host), date_time from readlog_logconfig  where endpoint like '%ajax%' group by host")
+	# cursor.execute("SELECT distinct(host), date_time, count(*) as c from readlog_logconfig  where endpoint like '%ajax%' group by host having c < 10")
 	# data2 = cursor.fetchall()
 	# temp2 = []
 	# count = 0
@@ -61,7 +61,7 @@ def preliminary_test():
 		cursor.execute("INSERT INTO readlog_badbotsip (host, Description, date_time, hits) VALUES (%s,%s,%s,%s)",(str(temp[i][0]), description_bad_ip, temp[i][1], hits))
 
 	# for i in range(len(temp2)):
-	# 	cursor.execute("INSERT INTO readlog_goodusers (host, Description, date_time) VALUES (%s,%s,%s)",(str(temp2[i][0]), description_good_ip, temp2[i][1]))
+	# 	cursor.execute("INSERT INTO readlog_goodusers (host, Description, date_time, hits) VALUES (%s,%s,%s,%s)",(str(temp2[i][0]), description_good_ip, temp2[i][1], temp2[i][2]))
 	local_host = """('127.0.0.1',)"""
 	cursor.execute("delete from readlog_badbotsip where host = %s",(local_host))
 	conn.commit()
