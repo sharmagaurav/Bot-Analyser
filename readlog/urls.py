@@ -11,6 +11,7 @@ urlpatterns = [
 	url(r'^login/$', views.logins, name = 'login'),
 	url(r'^logout/$', views.logouts, name='logout'),
 	url(r'^(?P<question_id>[0-9]+)/bad_ip_tables/(?P<host_id>[0-9]+)/$', views.bad_ip_details, name = 'bad_ip_tables'),	
+	url(r'^(?P<question_id>[0-9]+)/suspicious_ip_tables/(?P<host_id>[0-9]+)/$', views.suspicious_ip_details, name = 'suspicious_ip_details'),
 
 
 ]

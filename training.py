@@ -35,7 +35,7 @@ centroid_avg_sessions_per_day_suspicious = None
 total_hits_param_bad        = []
 total_hits_param_good       = []
 total_hits_param_suspicious = []
-total_hits_param_good_user  = []
+total_hits_param_good_user  = []					
 
 avg_time_per_session_bad        = []
 avg_time_per_session_good       = []
@@ -338,85 +338,117 @@ def avg_section_hits():
 		conn.commit()
 
 def deviation():
-	dev_total_hits_bad        = 0
-	dev_total_hits_good       = 0
-	dev_total_hits_suspicious = 0
-
-	dev_avg_section_bad        = 0
-	dev_avg_section_good       = 0
-	dev_avg_section_suspicious = 0
-
-	dev_avg_time_between_two_requests_bad        = 0
-	dev_avg_time_between_two_requests_good       = 0
-	dev_avg_time_between_two_requests_suspicious = 0
-
-	dev_avg_session_hits_bad        = 0
-	dev_avg_session_hits_good       = 0
-	dev_avg_session_hits_suspicious = 0
-
-	dev_avg_time_per_session_bad         = 0
-	dev_avg_time_per_session_good        = 0
-	dev_avg_time_per_session_suspiicious = 0
-
-	#First centroid : Total hits 
-	global centroid_total_hits_bad
-	global centroid_total_hits_good
-	global centroid_total_hits_suspicious
-	# Second centroid : Average number of section accessed
+	# First centroid : Average number of section accessed
 	global centroid_avg_section_bad
 	global centroid_avg_section_good
 	global centroid_avg_section_suspicious
-	#Third : Average time per session
-	global centroid_avg_time_per_session_bad
-	global centroid_avg_time_per_session_good
-	global centroid_avg_time_per_session_suspicious
-	#Fourth : Average session hits
-	global centroid_avg_session_hits_bad
-	global centroid_avg_session_hits_good
-	global centroid_avg_session_hits_suspicious
-	#Fifth : Average time between two consecutive requests
+	
+	#Second : Average time between two consecutive requests
 	global centroid_avg_time_between_two_requests_bad
 	global centroid_avg_time_between_two_requests_good
 	global centroid_avg_time_between_two_requests_suspicious
 
+	#Third : Avg sessions per day
+	global avg_sessions_per_day_bad
+	global avg_sessions_per_day_good
+	global avg_sessions_per_day_suspicious
+
 	dist = []
+	
 	a = numpy.array((float(centroid_avg_section_bad),float(centroid_avg_time_between_two_requests_bad),float(centroid_avg_sessions_per_day_bad)))
 	print a
 	for i in range(len(total_hits_param_bad)):
 		b = numpy.array((avg_section_hits_bad[i],avg_time_between_two_requests_bad[i],avg_sessions_per_day_bad[i]))
 		dist.append(numpy.linalg.norm(a-b))
 
-	sum = 0
+	sum = 0.0
 	for j in range(len(dist)):
 		sum+=dist[j]
-	dev = sum/len(dist)
-	print "deviation bad: ",dev
+	dev_b = sum/len(dist)
+	dev_bad = 0.0
+	deviation  = [0.0]*len(dist)
+	for j in range(len(dist)):
+		deviation[j] = dist[j] - dev_b
+
+	for j in range(len(deviation)):
+		dev_bad += deviation[j]
+	dev_bad = dev_bad/len(deviation)
+	if(dev_bad<0):
+		dev_bad*=-1.0
+	print "Mean distnace bad ",dev_b
+	print "deviation bad: ",dev_bad
 
 	dist = []
 	a = numpy.array((float(centroid_avg_section_good),float(centroid_avg_time_between_two_requests_good),float(centroid_avg_sessions_per_day_good)))
 	print a
 	for i in range(len(total_hits_param_good)):
-		b = numpy.array((avg_section_hits_good[i],avg_time_between_two_requests_good[i],avg_sessions_per_day_bad[i]))
+		b = numpy.array((avg_section_hits_good[i],avg_time_between_two_requests_good[i],avg_sessions_per_day_good[i]))
 		dist.append(numpy.linalg.norm(a-b))
 
-	sum = 0
+	sum = 0.0
 	for j in range(len(dist)):
 		sum+=dist[j]
-	dev = sum/len(dist)
-	print "deviation good: ",dev
+	dev_g = sum/len(dist)
+
+	dev_good = 0.0
+	deviation  = [0.0]*len(dist)
+	for j in range(len(dist)):
+		deviation[j] = dist[j] - dev_g
+
+	for j in range(len(deviation)):
+		dev_good += deviation[j]
+	dev_good = dev_good/len(deviation)
+	if(dev_good<0):
+		dev_good*=-1.0
+	print "Mean distnace good ",dev_g
+	print "deviation good: ",dev_good
 
 	dist = []
 	a = numpy.array((float(centroid_avg_section_suspicious),float(centroid_avg_time_between_two_requests_suspicious),float(centroid_avg_sessions_per_day_suspicious)))
 	print a
 	for i in range(len(total_hits_param_suspicious)):
-		b = numpy.array((avg_section_hits_suspicious[i],avg_time_between_two_requests_suspicious[i],avg_sessions_per_day_bad[i]))
+		b = numpy.array((avg_section_hits_suspicious[i],avg_time_between_two_requests_suspicious[i],avg_sessions_per_day_suspicious[i]))
 		dist.append(numpy.linalg.norm(a-b))
 
-	sum = 0
+	sum = 0.0
 	for j in range(len(dist)):
 		sum+=dist[j]
-	dev = sum/len(dist)
-	print "deviation suspicious: ",dev
+	dev_s = sum/len(dist)
+
+	dev_suspicious = 0.0
+	deviation  = [0.0]*len(dist)
+	for j in range(len(dist)):
+		deviation[j] = dist[j] - dev_s
+
+	for j in range(len(deviation)):
+		dev_suspicious += deviation[j]
+	dev_suspicious = dev_suspicious/len(deviation)
+	print "Mean distnace bad ",dev_s
+	if(dev_suspicious<0):
+		dev_suspicious*=-1.0
+	print "deviation suspicious: ",dev_suspicious
+	tables = ['readlog_badbotsip','readlog_goodbots','readlog_suspicious']
+
+	conn = MySQLdb.connect(host = "localhost", user = "root",
+							passwd = "1234", db = "logparsers")
+
+	cursor = conn.cursor()
+	bots_counts = []
+	for p in range(len(tables)):
+		cursor.execute("SELECT count(*) from %s" %tables[p])
+		data = cursor.fetchall()
+		bots_counts.append(data[0][0])
+	
+	
+	description = ['Bad Bots','Good Bots', 'Suspicious IPs']
+	for p in range(len(description)):
+		if(p==0):
+			cursor.execute("INSERT INTO readlog_training_centroids (Description, centroid1, centroid2, centroid3, count, deviation, distance) VALUES (%s,%s,%s,%s,%s,%s,%s)",(description[p],centroid_avg_section_bad,centroid_avg_time_between_two_requests_bad,centroid_avg_sessions_per_day_bad,bots_counts[p],dev_bad,dev_b))	
+		elif(p==1):
+			cursor.execute("INSERT INTO readlog_training_centroids (Description, centroid1, centroid2, centroid3, count, deviation, distance) VALUES (%s,%s,%s,%s,%s,%s,%s)",(description[p],centroid_avg_section_good,centroid_avg_time_between_two_requests_good,centroid_avg_sessions_per_day_good,bots_counts[p],dev_good,dev_g))
+		elif(p==2):
+			cursor.execute("INSERT INTO readlog_training_centroids (Description, centroid1, centroid2, centroid3, count, deviation, distance) VALUES (%s,%s,%s,%s,%s,%s,%s)",(description[p],centroid_avg_section_suspicious,centroid_avg_time_between_two_requests_suspicious,centroid_avg_sessions_per_day_suspicious,bots_counts[p],dev_suspicious,dev_s))
+	conn.commit()
 
 def session_calculation():
 	conn = MySQLdb.connect(host = "localhost", user = "root",
@@ -441,7 +473,7 @@ def session_calculation():
 		avg_session_hits = [0]*len(data)
 
 		for i in range(len(hosts)):
-			cursor.execute("SELECT date_time from readlog_logconfig where host = %s", (hosts[i]))
+			cursor.execute("SELECT date_time from readlog_logconfig where host = %s order by date_time asc", (hosts[i]))
 			temp = cursor.fetchall()
 			dates = []
 			#print hosts[i]
@@ -464,8 +496,15 @@ def session_calculation():
 						pass
 					else:
 						sess_count+=1
-						
+
+			cursor.execute("SELECT count(distinct(date(date_time))) from readlog_logconfig where host = %s",(hosts[i]))
+			data_dates = cursor.fetchall()
+			num_dates = data_dates[0][0]	
+			
 			session[i] = sess_count
+			#print "Num_dates ",num_dates," Num sessions ",session[i]," = ",float(session[i])/float(num_dates)
+			session[i] = float(session[i])/float(num_dates)
+			#time.sleep(2)
 
 		for m in range(len(session)):
 			avg_session_hits[m] = hits[m]/session[m]
@@ -483,17 +522,54 @@ def session_calculation():
 				avg_sessions_per_day_suspicious.append(session[k])
 
 		if(x==0):
-			print "Avg session hits bad ",sum/len(avg_session_hits)
-			print "Avg session number bad ", (sums/float(len(session)))/4
-			centroid_avg_sessions_per_day_bad = (sums/float(len(session)))/4
+			# print "Avg session hits bad ",sum/len(avg_session_hits)
+			# print "Avg session number bad ", (sums/float(len(session)))
+			print "List_bad",len(avg_sessions_per_day_bad)
+			centroid_avg_sessions_per_day_bad = (sums/float(len(session)))
 		elif(x==1):
-			print "Avg session hits good ",sum/len(avg_session_hits)
-			print "Avg session number good ", (sums/float(len(session)))/4
-			centroid_avg_sessions_per_day_good = (sums/float(len(session)))/4
+			# print "Avg session hits good ",sum/len(avg_session_hits)
+			# print "Avg session number good ", (sums/float(len(session)))
+			centroid_avg_sessions_per_day_good = (sums/float(len(session)))
+			print "List good",len(avg_sessions_per_day_good)
 		elif(x==2):
-			print "Avg session hits suspicious ",sum/len(avg_session_hits) 
-			print "Avg session number suspicious ", (sums/float(len(session)))/4
-			centroid_avg_sessions_per_day_suspicious = (sums/float(len(session)))/4
+			# print "Avg session hits suspicious ",sum/len(avg_session_hits) 
+			# print "Avg session number suspicious ", (sums/float(len(session)))
+			centroid_avg_sessions_per_day_suspicious = (sums/float(len(session)))
+			print "List suspicious",len(avg_sessions_per_day_suspicious)
+
+def get_dates_of_access():
+	conn = MySQLdb.connect(host = "localhost", user = "root",
+							passwd = "1234", db = "logparsers")
+
+	cursor        = conn.cursor()
+	count         = []
+	centroid1     = []
+	centroid2     = []
+	centroid3     = []
+	deviation     = []
+	mean_distance = []
+	des = ['Bad Bots','Good Bots','Suspicious IPs']
+	for i in range(len(des)):
+		cursor.execute("SELECT count,centroid1, centroid2, centroid3, deviation, distance from readlog_training_centroids where description = %s", (des[i]))
+		data = cursor.fetchall()
+		print data[0][0], data[0][1], data[0][2]
+		count.append(data[0][0])
+		centroid1.append(data[0][1])
+		centroid2.append(data[0][2])
+		centroid3.append(data[0][3])
+		deviation.append(data[0][4])
+		mean_distance.append(data[0][5])
+
+	for i in range(len(des)):
+		print des[i]
+		print count[i]
+		print centroid1[i]
+		print centroid2[i]
+		print centroid3[i]
+		print deviation[i]
+		print mean_distance[i]
+
+	conn.commit()
 
 
 if __name__ == '__main__':
@@ -527,3 +603,4 @@ if __name__ == '__main__':
 	print centroid_avg_sessions_per_day_suspicious
 
 	deviation()
+	#get_dates_of_access()

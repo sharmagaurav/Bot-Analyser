@@ -120,6 +120,9 @@
                                             <th>ID</th>
                                             <th>HOST</th>
                                             <th>DESCRIPTION</th>
+                                            <th>HITS</th>
+                                            <th>LAST ACCESS</th>
+                                            <th>DETAILS</th>
                                             
                                         </tr>
                                     </thead>
@@ -131,7 +134,10 @@
                                                 <tr class="gradeU">
                                                     <td>{{forloop.counter}}</td>
                                                     <td>{{detail.host}}</td>
-                                                    <td>{{detail.Description}}</td>
+                                                    <td>{{detail.Description}}</td> 
+                                                    <td>{{detail.hits}}</td>
+                                                    <td>{{detail.date_time}}</td>
+                                                    <td><a href = "/readlog/{{last_month}}/suspicious_ip_tables/{{detail.id}}/">View details</a></td>
                                                     
                                                 </tr>
                                             {% endfor %}
@@ -143,7 +149,10 @@
                                                 <tr class="gradeU">
                                                     <td>{{forloop.counter}}</td>
                                                     <td>{{detail.host}}</td>
-                                                    <td>{{detail.Description}}</td>
+                                                    <td>{{detail.Description}}</td> 
+                                                    <td>{{detail.hits}}</td>
+                                                    <td>{{detail.date_time}}</td>
+                                                    <td><a href = "/readlog/{{last_month}}/suspicious_ip_tables/{{detail.id}}/">View details</a></td>
                                                     
                                                 </tr>
                                             {% endfor %}
@@ -155,7 +164,10 @@
                                                 <tr class="gradeU">
                                                     <td>{{forloop.counter}}</td>
                                                     <td>{{detail.host}}</td>
-                                                    <td>{{detail.Description}}</td>
+                                                    <td>{{detail.Description}}</td> 
+                                                    <td>{{detail.hits}}</td>
+                                                    <td>{{detail.date_time}}</td>
+                                                    <td><a href = "/readlog/{{last_month}}/suspicious_ip_tables/{{detail.id}}/">View details</a></td>
                                                     
                                                 </tr>
                                             {% endfor %}
@@ -167,7 +179,10 @@
                                                 <tr class="gradeU">
                                                     <td>{{forloop.counter}}</td>
                                                     <td>{{detail.host}}</td>
-                                                    <td>{{detail.Description}}</td>
+                                                    <td>{{detail.Description}}</td> 
+                                                    <td>{{detail.hits}}</td>
+                                                    <td>{{detail.date_time}}</td>
+                                                    <td><a href = "/readlog/{{last_month}}/suspicious_ip_tables/{{detail.id}}/">View details</a></td>
                                                     
                                                 </tr>
                                             {% endfor %}

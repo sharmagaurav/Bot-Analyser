@@ -125,6 +125,7 @@
                                             <th>HOST</th>
                                             <th>DESCRIPTION</th>
                                             <th>HITS</th>
+                                            <th>LAST ACCESS</th>
                                             <th>DETAILS</th>
                                             
                                         </tr>
@@ -140,7 +141,8 @@
                                                     <td>{{detail.host}}</td>
                                                     <td>{{detail.Description}}</td>
                                                     <td>{{detail.hits}}</td>
-                                                    <td><a href = "#">View details</a></td>
+                                                    <td>{{detail.date_time}}</td>
+                                                    <td><a href = "/readlog/{{last_month}}/bad_ip_tables/{{detail.id}}/">View details</a></td>
                                                     
                                                 </tr>
                                             {% endfor %}
@@ -154,7 +156,8 @@
                                                     <td>{{detail.host}}</td>
                                                     <td>{{detail.Description}}</td>
                                                     <td>{{detail.hits}}</td>
-                                                    <td><a href = "#">View details</a></td>
+                                                    <td>{{detail.date_time}}</td>
+                                                    <td><a href = "/readlog/{{last_month}}/bad_ip_tables/{{detail.id}}/">View details</a></td>
                                                     
                                                 </tr>
                                             {% endfor %}
@@ -168,7 +171,8 @@
                                                     <td>{{detail.host}}</td>
                                                     <td>{{detail.Description}}</td>
                                                     <td>{{detail.hits}}</td>
-                                                    <td><a href = "#">View details</a></td>
+                                                    <td>{{detail.date_time}}</td>
+                                                    <td><a href = "/readlog/{{last_month}}/bad_ip_tables/{{detail.id}}/">View details</a></td>
                                                     
                                                 </tr>
                                             {% endfor %}
@@ -182,6 +186,7 @@
                                                     <td>{{detail.host}}</td>
                                                     <td>{{detail.Description}}</td>
                                                     <td>{{detail.hits}}</td>
+                                                    <td>{{detail.date_time}}</td>
                                                     <td><a href = "/readlog/{{last_month}}/bad_ip_tables/{{detail.id}}/">View details</a></td>
                                                     
                                                 </tr>
