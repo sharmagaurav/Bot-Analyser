@@ -109,7 +109,9 @@ def get_old_access_logs():
 						else:
 							temp_host = [x.strip() for x in m[0].split(',')]
 							if(temp_host[0]=='127.0.0.1' and len( temp_host)>1):
-								host1      = temp_host[1]
+								#host1      = temp_host[1]
+								count+=1
+								continue
 							else:
 								host1      = temp_host[0]
 							client_id2     = t

@@ -57,6 +57,8 @@ def extract_hosts():
                             passwd = "1234", db = "logparsers")
 	cursor = conn.cursor()
 
+	global host_list
+
 	cursor.execute("SELECT distinct(host) from readlog_badbotsip_test")
 	data = cursor.fetchall()
 	b = set(data)
@@ -141,6 +143,7 @@ def get_training_centroids():
 		print mean_distance[i]
 
 	conn.commit()
+	print "ajkja",len(host_list)
 
 	# count.append(10)
 	# count.append(20)
@@ -156,10 +159,6 @@ def get_training_centroids():
 
 
 
-
-
-
-
 def feature2():
 	print "entered feature2"
 	conn = MySQLdb.connect(host = "localhost", user = "root",
@@ -167,6 +166,7 @@ def feature2():
 	cursor = conn.cursor()
 
 	m = len(host_list)
+	print m
 		
 	for i in range(m):	
 		cursor.execute("SELECT count(*) as c, section from readlog_logconfig_test WHERE host = %s group by section having c > 5",(host_list[i]))
@@ -430,8 +430,11 @@ def cal_distance():
 				sum_mean_distance[2] += dist[2]
 
 	print "bad" , countb, " ", len(test_bad)
+	print test_bad
 	print "good" , cg, " ", len(test_good)
+	print test_good
 	print "sus" , cs, " ", len(test_suspicious)
+	print test_suspicious
 
 		
 def insert_test():
@@ -665,14 +668,14 @@ def lll():
 
 if __name__ == '__main__':
 
-	# extract_hosts()
-	# get_training_centroids()
-	# feature2()
-	# feature3()
-	# feature6()
-	# #insert_db()
-	# cal_distance()
-	# #insert_test()
-	# cal_centroid()
-	# #insert_new_values()
-	lll()
+	extract_hosts()
+	get_training_centroids()
+	feature2()
+	feature3()
+	feature6()
+	insert_db()
+	cal_distance()
+	#insert_test()
+	cal_centroid()
+	# insert_new`_values()
+	#lll()

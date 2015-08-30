@@ -44,53 +44,105 @@ last_week_date = datetime.strptime(last_week_date, '%Y-%m-%d %H:%M:%S')
 this_month = str(date.today())
 this_month = int(this_month[8]+this_month[9])
 last_month_date = str(date.today()- timedelta(days=this_month-1)) + " 00:00:00"
+last_month_date_end = str(date.today()- timedelta(days=this_month-1)) + " 23:59:59"
+
+ll = str(date.today()- timedelta(days=this_month-1))
+ll = datetime.strptime(ll, '%Y-%m-%d')
 last_month_date = datetime.strptime(last_month_date, '%Y-%m-%d %H:%M:%S')
+last_month_date_end = datetime.strptime(last_month_date_end, '%Y-%m-%d %H:%M:%S')
 
 
-date_five =last_month_date + timedelta(days = 4)
+date_five =last_month_date + timedelta(days = 7)
+date_five_1 =ll + timedelta(days = 7)
+date_five_2 = last_month_date_end + timedelta(days = 7)
 date_ten = last_month_date + timedelta(days= 9)
+date_ten_2 = last_month_date_end + timedelta(days= 9)
 date_15  = last_month_date + timedelta(days=14)
+date_15_2 = last_month_date_end + timedelta(days=14)
 date_20  = last_month_date + timedelta(days=19)
+date_20_2  = last_month_date_end + timedelta(days=19)
 date_25  = last_month_date + timedelta(days=24)
+date_25_2  = last_month_date_end + timedelta(days=24)
 date_30  = last_month_date + timedelta(days=29)
+date_30_2  = last_month_date_end + timedelta(days=29)
 
 
 # Create your views here.
 @csrf_exempt
 def index(request):
-	bad_ip = BadBotsIp_test.objects.order_by('id').count()
-	good_ip = GoodBots_test.objects.order_by('id').count()
+
+	st = last_month_date
+	tod_date = datetime.now()
+	tod_date = datetime.strftime(tod_date, '%Y-%m-%d %H:%M:%S')
+	tod_date = datetime.strptime(tod_date, '%Y-%m-%d %H:%M:%S')
+
+	et = tod_date
+
+	if 'start' in request.GET and 'end' in request.GET and request.GET['start']!=None and request.GET['end']!=None:
+		st = request.GET['start'] + ' 00:00:00'
+		st = datetime.strptime(st, '%Y-%m-%d %H:%M:%S')
+		et = request.GET['end'] + ' 23:59:59'
+		et = datetime.strptime(et, '%Y-%m-%d %H:%M:%S')
+
+
+
+	#bad_ip = BadBotsIp_test.objects.order_by('id').count()
+	#good_ip = GoodBots_test.objects.order_by('id').count()
 	#good_user = GoodUsers_test.objects.order_by('id').count()
-	suspicious_ip = Suspicious_test.objects.order_by('id').count()
+	#suspicious_ip = Suspicious_test.objects.order_by('id').count()
 
-	bad_ip_yesterday = BadBotsIp_test.objects.filter(date_time__gt=date_time_yesterday).count()
-	good_ip_yesterday = GoodBots_test.objects.filter(date_time__gt=date_time_yesterday).count()
+	#bad_ip_yesterday = BadBotsIp_test.objects.filter(date_time__gt=date_time_yesterday).count()
+	#good_ip_yesterday = GoodBots_test.objects.filter(date_time__gt=date_time_yesterday).count()
 	#good_user_yesterday = GoodUsers_test.objects.filter(date_time__gt=date_time_yesterday).count()
-	suspicious_ip_yesterday = Suspicious_test.objects.filter(date_time__gt=date_time_yesterday).count()
-	hits_yesterday = logconfig_test_dump.objects.values('host').filter(date_time__gt=date_time_yesterday).distinct().count()
+	#suspicious_ip_yesterday = Suspicious_test.objects.filter(date_time__gt=date_time_yesterday).count()
+	#hits_yesterday = logconfig_test_dump.objects.values('host').filter(date_time__gt=date_time_yesterday).distinct().count()
 
-	bad_ip_last_hour = BadBotsIp_test.objects.filter(date_time__gt=date_time_last_hour).count()
-	good_ip_last_hour = GoodBots_test.objects.filter(date_time__gt=date_time_last_hour).count()
+	#bad_ip_last_hour = BadBotsIp_test.objects.filter(date_time__gt=date_time_last_hour).count()
+	#good_ip_last_hour = GoodBots_test.objects.filter(date_time__gt=date_time_last_hour).count()
 	#good_user_last_hour = GoodUsers_test.objects.filter(date_time__gt=date_time_last_hour).count()
-	suspicious_ip_last_hour = Suspicious_test.objects.filter(date_time__gt=date_time_last_hour).count()
-	hits_last_hour = logconfig_test_dump.objects.values('host').filter(date_time__gt=date_time_last_hour).distinct().count()
+	#suspicious_ip_last_hour = Suspicious_test.objects.filter(date_time__gt=date_time_last_hour).count()
+	#hits_last_hour = logconfig_test_dump.objects.values('host').filter(date_time__gt=date_time_last_hour).distinct().count()
 
-	bad_ip_last_week = BadBotsIp_test.objects.filter(date_time__gt=last_week_date).count()
-	good_ip_last_week = GoodBots_test.objects.filter(date_time__gt=last_week_date).count()
+	#bad_ip_last_week = BadBotsIp_test.objects.filter(date_time__gt=last_week_date).count()
+	#good_ip_last_week = GoodBots_test.objects.filter(date_time__gt=last_week_date).count()
 	#good_user_last_week = GoodUsers_test.objects.filter(date_time__gt=last_week_date).count()
-	suspicious_ip_last_week = Suspicious_test.objects.filter(date_time__gt=last_week_date).count()
-	hits_last_week = logconfig_test_dump.objects.values('host').filter(date_time__gt=last_week_date).distinct().count()
+	#suspicious_ip_last_week = Suspicious_test.objects.filter(date_time__gt=last_week_date).count()
+	#hits_last_week = logconfig_test_dump.objects.values('host').filter(date_time__gt=last_week_date).distinct().count()
 
-	bad_ip_last_month = BadBotsIp_test.objects.filter(date_time__gt=last_month_date).count()
-	good_ip_last_month = GoodBots_test.objects.filter(date_time__gt=last_month_date).count()
+	#bad_ip_last_month = BadBotsIp_test.objects.filter(date_time__gt=last_month_date).count()
+	#good_ip_last_month = GoodBots_test.objects.filter(date_time__gt=last_month_date).count()
 	#good_user_last_month = GoodUsers_test.objects.filter(date_time__gt=last_month_date).count()
-	suspicious_ip_last_month = Suspicious_test.objects.filter(date_time__gt=last_month_date).count()
-	hits_last_month = logconfig_test_dump.objects.filter(date_time__gt=last_month_date).values('host').distinct().count()
+	#suspicious_ip_last_month = Suspicious_test.objects.filter(date_time__gt=last_month_date).count()
+	#hits_last_month = logconfig_test_dump.objects.filter(date_time__gt=last_month_date).values('host').distinct().count()
+	# if st == et:
+	# 	bad_ips_range = BadBotsIp_test.objects.filter(date_time=st).count()
+	# 	good_ips_range = GoodBots_test.objects.filter(date_time=st).count()
+	# 	suspicious_ips_range = Suspicious_test.objects.filter(date_time=st).count()
+	# 	hits_in_range = logconfig_test_dump.objects.filter(date_time=st).values('host').distinct().count()
+	# 	hits_in_ranges = logconfig_test_dump.objects.filter(date_time=st).values('host').distinct().count()
+	# else:
+	bad_ips_range = BadBotsIp_test.objects.filter(date_time__range=(st,et)).count()
+	good_ips_range = GoodBots_test.objects.filter(date_time__range=(st,et)).count()
+	suspicious_ips_range = Suspicious_test.objects.filter(date_time__range=(st,et)).count()
+	hits_in_range = logconfig_test_dump.objects.filter(date_time__range=(st,et)).values('host').distinct().count()
 
-	bad_hosts = BadBotsIp_test.objects.all()
-	bad_bots_first = logconfig_test_dump.objects.filter(host__in=bad_hosts, date_time=date_five).count()
-	good_bots_first = GoodBots_test.objects.filter(date_time=date_five).count()
 
+
+	bad_hosts = BadBotsIp_test.objects.all().values('host')
+	good_hosts = GoodBots_test.objects.all().values('host')
+	
+	bad_bots_first = logconfig_test_dump.objects.filter(host__in=bad_hosts, date_time__range=(date_five,date_five_2)).count()
+	bad_bots_ten = logconfig_test_dump.objects.filter(host__in=bad_hosts, date_time__range=(date_ten,date_ten_2)).count()
+	bad_bots_15 = logconfig_test_dump.objects.filter(host__in=bad_hosts, date_time__range=(date_15,date_15_2)).count()
+	bad_bots_20 = logconfig_test_dump.objects.filter(host__in=bad_hosts, date_time__range=(date_20,date_20_2)).count()
+	bad_bots_25 = logconfig_test_dump.objects.filter(host__in=bad_hosts, date_time__range=(date_25,date_25_2)).count()
+	bad_bots_30 = logconfig_test_dump.objects.filter(host__in=bad_hosts, date_time__range=(date_30,date_30_2)).count()
+	good_bots_first = logconfig_test_dump.objects.filter(host__in=good_hosts,date_time__range=(date_five,date_five_2)).count()
+	good_bots_ten = logconfig_test_dump.objects.filter(host__in=good_hosts,date_time__range=(date_ten,date_ten_2)).count()
+	good_bots_15 = logconfig_test_dump.objects.filter(host__in=good_hosts,date_time__range=(date_15,date_15_2)).count()
+	good_bots_20 = logconfig_test_dump.objects.filter(host__in=good_hosts,date_time__range=(date_20,date_20_2)).count()
+	good_bots_25 = logconfig_test_dump.objects.filter(host__in=good_hosts,date_time__range=(date_25,date_25_2)).count()
+	good_bots_30 = logconfig_test_dump.objects.filter(host__in=good_hosts,date_time__range=(date_30,date_30_2)).count()
 
 
 	mn = datetime.now()
@@ -100,48 +152,72 @@ def index(request):
 	yesterday = 2
 	last_week = 3
 	last_month= 4
-	template = loader.get_template('readlog/index1.html')
+	template = loader.get_template('readlog/index.html')
 	context = RequestContext(request,{
-		'bad_ip': bad_ip,
-		'good_ip': good_ip,
+		#'bad_ip': bad_ip,
+		#'good_ip': good_ip,
 		#'good_user': good_user,
-		'suspicious_ip': suspicious_ip,
-		'bad_ip_yesterday': bad_ip_yesterday,
-		'good_ip_yesterday': good_ip_yesterday,
+		#'suspicious_ip': suspicious_ip,
+		#'bad_ip_yesterday': bad_ip_yesterday,
+		#'good_ip_yesterday': good_ip_yesterday,
 		#'good_user_yesterday': good_user_yesterday,
-		'suspicious_ip_yesterday': suspicious_ip_yesterday,
-		'bad_ip_last_hour': bad_ip_last_hour,
-		'good_ip_last_hour': good_ip_last_hour,
+		#'suspicious_ip_yesterday': suspicious_ip_yesterday,
+		#'bad_ip_last_hour': bad_ip_last_hour,
+		#'good_ip_last_hour': good_ip_last_hour,
 		#'good_user_last_hour': good_user_last_hour,
-		'suspicious_ip_last_hour': suspicious_ip_last_hour,
-		'bad_ip_last_month': bad_ip_last_month,
-		'good_ip_last_month': good_ip_last_month,
+		#'suspicious_ip_last_hour': suspicious_ip_last_hour,
+		#'bad_ip_last_month': bad_ip_last_month,
+		#'good_ip_last_month': good_ip_last_month,
 		#'good_user_last_month': good_user_last_month,
-		'suspicious_ip_last_month': suspicious_ip_last_month,
-		'bad_ip_last_week': bad_ip_last_week,
-		'good_ip_last_week': good_ip_last_week,
+		#'suspicious_ip_last_month': suspicious_ip_last_month,
+		#'bad_ip_last_week': bad_ip_last_week,
+		#'good_ip_last_week': good_ip_last_week,
 		#'good_user_last_week': good_user_last_week,
-		'suspicious_ip_last_week': suspicious_ip_last_week,
+		#'suspicious_ip_last_week': suspicious_ip_last_week,
 		'last_hour' : last_hour,
 		'yesterday': yesterday,
 		'last_week': last_week,
 		'last_month': last_month,
-		'mn' : mn,
-		'hits_yesterday': hits_yesterday,
-		'hits_last_hour' : hits_last_hour,
-		'hits_last_month' : hits_last_month,
-		'hits_last_week' : hits_last_week,
+		#'mn' : mn,
+		#'hits_yesterday': hits_yesterday,
+		#'hits_last_hour' : hits_last_hour,
+		#'hits_last_month' : hits_last_month,
+		#'hits_last_week' : hits_last_week,
 		'bad_bots_first' : bad_bots_first,
-		'good_bots_first' : good_bots_first
+		'bad_bots_ten' : bad_bots_ten,
+		'bad_bots_15' : bad_bots_15,
+		'bad_bots_20' : bad_bots_20,
+		'bad_bots_25' : bad_bots_25,
+		'bad_bots_30' : bad_bots_30,
+		'good_bots_first' : good_bots_first,
+		'good_bots_ten' : good_bots_ten,
+		'good_bots_15' : good_bots_15,
+		'good_bots_20' : good_bots_20,
+		'good_bots_25' : good_bots_25,
+		'good_bots_30' : good_bots_30,
+		'bad_ips_range' : bad_ips_range,
+		'good_ips_range' : good_ips_range,
+		'suspicious_ips_range' : suspicious_ips_range,
+		'hits_in_range' : hits_in_range,
+		'st': st,
+		'et': et,
+		#'hits_in_ranges' : hits_in_ranges,
 		})
+
 	return HttpResponse(template.render(context))
 
 def good_bot_tables(request,question_id):
+	if 'start' in request.GET and 'end' in request.GET and request.GET['start']!=None and request.GET['end']!=None:
+		st = request.GET['start'] + ' 00:00:00'
+		st = datetime.strptime(st, '%Y-%m-%d %H:%M:%S')
+		et = request.GET['end'] + ' 23:59:59'
+		et = datetime.strptime(et, '%Y-%m-%d %H:%M:%S')
+
 	good_ip = GoodBots_test.objects.all()
-	good_ip_yesterday = GoodBots_test.objects.filter(date_time__gt=date_time_yesterday).order_by('-hits')
-	good_ip_last_week = GoodBots_test.objects.filter(date_time__gt=last_week_date).order_by('-hits')
-	good_ip_last_hour = GoodBots_test.objects.filter(date_time__gt=date_time_last_hour).order_by('-hits')
-	good_ip_last_month = GoodBots_test.objects.filter(date_time__gt=last_month_date).order_by('-hits')
+	good_ip_yesterday = GoodBots_test.objects.filter(date_time__range=(st,et)).order_by('-hits')
+	good_ip_last_week = GoodBots_test.objects.filter(date_time__range=(st,et)).order_by('-hits')
+	good_ip_last_hour = GoodBots_test.objects.filter(date_time__range=(st,et)).order_by('-hits')
+	good_ip_last_month = GoodBots_test.objects.filter(date_time__range=(st,et)).order_by('-hits')
 
 	last_hour = 1
 	yesterday = 2
@@ -191,11 +267,17 @@ def good_user_tables(request,question_id):
 	return HttpResponse(template.render(context))
 
 def bad_ip_tables(request,question_id):
+	if 'start' in request.GET and 'end' in request.GET and request.GET['start']!=None and request.GET['end']!=None:
+		st = request.GET['start'] + ' 00:00:00'
+		st = datetime.strptime(st, '%Y-%m-%d %H:%M:%S')
+		et = request.GET['end'] + ' 23:59:59'
+		et = datetime.strptime(et, '%Y-%m-%d %H:%M:%S')
+
 	bad_ip = BadBotsIp_test.objects.all()
-	bad_ip_yesterday = BadBotsIp_test.objects.filter(date_time__gt=date_time_yesterday).order_by('-hits')
-	bad_ip_last_hour = BadBotsIp_test.objects.filter(date_time__gt=date_time_last_hour).order_by('-hits')
-	bad_ip_last_week = BadBotsIp_test.objects.filter(date_time__gt=last_week_date).order_by('-hits')
-	bad_ip_last_month = BadBotsIp_test.objects.filter(date_time__gt=last_month_date).order_by('-hits')
+	bad_ip_yesterday = BadBotsIp_test.objects.filter(date_time__range=(st,et)).order_by('-hits')
+	bad_ip_last_hour = BadBotsIp_test.objects.filter(date_time__range=(st,et)).order_by('-hits')
+	bad_ip_last_week = BadBotsIp_test.objects.filter(date_time__range=(st,et)).order_by('-hits')
+	bad_ip_last_month = BadBotsIp_test.objects.filter(date_time__range=(st,et)).order_by('-hits')
 
 	last_hour = 1
 	yesterday = 2
@@ -218,11 +300,17 @@ def bad_ip_tables(request,question_id):
 	return HttpResponse(template.render(context))
 
 def suspicious_ip_tables(request,question_id):
+	if 'start' in request.GET and 'end' in request.GET and request.GET['start']!=None and request.GET['end']!=None:
+		st = request.GET['start'] + ' 00:00:00'
+		st = datetime.strptime(st, '%Y-%m-%d %H:%M:%S')
+		et = request.GET['end'] + ' 23:59:59'
+		et = datetime.strptime(et, '%Y-%m-%d %H:%M:%S')
+		
 	suspicious_ip = Suspicious_test.objects.order_by('id')
-	suspicious_ip_yesterday = Suspicious_test.objects.filter(date_time__gt=date_time_yesterday).order_by('-hits')
-	suspicious_ip_last_hour = Suspicious_test.objects.filter(date_time__gt=date_time_last_hour).order_by('-hits')
-	suspicious_ip_last_week = Suspicious_test.objects.filter(date_time__gt=last_week_date).order_by('-hits')
-	suspicious_ip_last_month = Suspicious_test.objects.filter(date_time__gt=last_month_date).order_by('-hits')
+	suspicious_ip_yesterday = Suspicious_test.objects.filter(date_time__range=(st,et)).order_by('-hits')
+	suspicious_ip_last_hour = Suspicious_test.objects.filter(date_time__range=(st,et)).order_by('-hits')
+	suspicious_ip_last_week = Suspicious_test.objects.filter(date_time__range=(st,et)).order_by('-hits')
+	suspicious_ip_last_month = Suspicious_test.objects.filter(date_time__range=(st,et)).order_by('-hits')
 
 	last_hour = 1
 	yesterday = 2

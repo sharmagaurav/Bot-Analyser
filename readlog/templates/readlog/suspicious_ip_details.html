@@ -77,13 +77,13 @@
                 <div class="sidebar-nav navbar-collapse">
                     <ul class="nav" id="side-menu">
                         <li>
-                            <a href="{%url 'readlog.views.index' %}"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+                            <a href="#" id = "dashdiv" onclick = "redirects(this.id);"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                         </li>
                          <li>
-                            <a href="/readlog/{{last_month}}/good_bot_tables/"><i class="fa fa-dashboard fa-fw"></i> Good Crawlers</a>
+                            <a href="#" id = "gooddiv" onclick = "redirects(this.id);"><i class="fa fa-dashboard fa-fw"></i> Good Crawlers</a>
                         </li>
                         <li>
-                            <a href="/readlog/{{last_month}}/bad_ip_tables/"><i class="fa fa-dashboard fa-fw"></i> Bad bots</a>
+                            <a href="#" id = "baddiv" onclick = "redirects(this.id);"><i class="fa fa-dashboard fa-fw"></i> Bad bots</a>
                         </li>
                     </ul>
                 </div>
@@ -299,7 +299,53 @@
 
     </div>
     <!-- /#wrapper -->
+    <script type="text/javascript">
+        function redirects(idz){
+            var vars = [], hash;
 
+            var date = new Date()
+            var today = date.getDate()
+            var month = date.getMonth() + 1
+            var year = date.getFullYear()
+            if(month<10) {
+                month = '0' + month 
+            }
+            else {
+                month = '1' + month
+            }
+            var fullDateInitial = year + '-'+month + '-01'
+            var fullDateToday = year + '-'+ month + '-' + today
+            var st = fullDateInitial
+            var et = fullDateToday
+
+            var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+            for (var i = 0; i < hashes.length; i++) {
+                hash = hashes[i].split('=');
+                vars.push(hash[1]);
+                vars[hash[1]] = hash[1];
+            }
+            if(vars!=''){
+                st = vars[0];
+                et = vars[1];
+            }
+    
+            if(idz == 'baddiv'){
+                window.location = "http://127.0.0.1:8000/readlog/4/bad_ip_tables/?start="+st+"&end="+et;
+            }
+
+            else if(idz == 'suspiciousdiv'){
+                window.location = "http://127.0.0.1:8000/readlog/4/suspicious_ip_tables/?start="+st+"&end="+et;
+            }
+            else if(idz == 'gooddiv'){
+                window.location = "http://127.0.0.1:8000/readlog/4/good_bot_tables/?start="+st+"&end="+et;
+            }
+            else if(idz == 'dashdiv'){
+                window.location = "http://127.0.0.1:8000/readlog/?start="+st+"&end="+et;
+            }
+            
+        }
+    </script>
+    
     <!-- jQuery -->
     <script src="{% static 'readlog/bower_components/jquery/dist/jquery.min.js' %}"></script>
 

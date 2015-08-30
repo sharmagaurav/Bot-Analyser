@@ -31,7 +31,7 @@
     <!-- Custom Fonts -->
     <link href="{% static 'readlog/bower_components/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
 
-
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -679,11 +679,11 @@
           element: 'morris-line-chart',
           data: [
             { y: dates[1], a: {{bad_bots_first}},  b: {{good_bots_first}} },
-            { y: dates[2], a: 50,  b: 40 },
-            { y: dates[3], a: 75,  b: 65 },
-            { y: dates[4], a: 50,  b: 40 },
-            { y: dates[5], a: 75,  b: 65 },
-            { y: dates[6], a: 100, b: 90 }
+            { y: dates[2], a: {{bad_bots_ten}},  b: {{good_bots_ten}} },
+            { y: dates[3], a: {{bad_bots_15}},  b: {{good_bots_15}} },
+            { y: dates[4], a: {{bad_bots_20}},  b: {{good_bots_20}} },
+            { y: dates[5], a: {{bad_bots_25}},  b: {{good_bots_25}} },
+            { y: dates[6], a: {{bad_bots_30}}, b: {{good_bots_30}} }
           ],
           xkey: 'y',
           ykeys: ['a', 'b'],

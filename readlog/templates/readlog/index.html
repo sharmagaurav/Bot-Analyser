@@ -1,13 +1,480 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-<meta http-equiv="refresh" content="0;url=pages/index.html">
-<title>SB Admin 2</title>
-<script language="javascript">
-    window.location.href = "pages/index.html"
-</script>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Bot Analyzer</title>
+    {% load staticfiles %}
+    <!-- Bootstrap Core CSS -->
+
+    <link href="{% static 'readlog/bower_components/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <link href="{% static 'readlog/bower_components/bootstrap/dist/css/bootstrap.css' %}" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" media="all" href="{% static 'readlog/date/daterangepicker.css' %}" />
+
+    <!-- MetisMenu CSS -->
+    <link href="{% static 'readlog/bower_components/metisMenu/dist/metisMenu.min.css' %}" rel="stylesheet">
+
+    <!-- Timeline CSS -->
+    <link href="{% static 'readlog/dist/css/timeline.css' %}" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{% static 'readlog/dist/css/sb-admin-2.css' %}" rel="stylesheet">
+
+    <!-- Morris Charts CSS -->
+    <link href="{% static 'readlog/bower_components/morrisjs/morris.css' %}" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="{% static 'readlog/bower_components/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    <script src="{% static 'readlog/bower_components/jquery/dist/jquery.min.js' %}"></script>
+
+    <!-- Morris Charts JavaScript -->
+    <script src="{% static 'readlog/bower_components/raphael/raphael-min.js' %}" type="text/javascript"></script>
+    <script src="{% static 'readlog/bower_components/morrisjs/morris.min.js' %}" type="text/javascript"></script>
+
+    <!-- datepicker js -->
+    <script type="text/javascript" src="{% static 'readlog/date/moment.js' %}"></script>
+    <script type="text/javascript" src="{% static 'readlog/date/daterangepicker.js' %}"></script>
+    
+
+
 </head>
+
 <body>
-Go to <a href="pages/index.html">/pages/index.html</a>
+    {% if user.is_authenticated %}
+    <div id="wrapper">
+
+        <!-- Navigation -->
+        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{%url 'readlog.views.index' %}">Bots Analyser</a>
+            </div>
+            <!-- /.navbar-header -->
+
+            <ul class="nav navbar-top-links navbar-right">
+                <li class="dropdown">
+                    <input type="text" id="config-demo" class="form-control">
+                <!-- /.dropdown -->
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-user">
+                        <!-- <li><a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
+                        </li>
+                        <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
+                        </li> -->
+                        <li class="divider"></li>
+                        <li><a href="{%url 'readlog.views.logouts' %}"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                        </li>
+                    </ul>
+                    <!-- /.dropdown-user -->
+                </li>
+                <!-- /.dropdown -->
+            </ul>
+            <!-- /.navbar-top-links -->
+
+            <div class="navbar-default sidebar" role="navigation">
+                <div class="sidebar-nav navbar-collapse">
+                    <ul class="nav" id="side-menu">
+                       <li>
+                            <a href="#" id = "dashdiv" onclick = "redirects(this.id);"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+                        </li>
+                         <li>
+                            <a href="#" id = "gooddiv" onclick = "redirects(this.id);"><i class="fa fa-dashboard fa-fw"></i> Good Crawlers</a>
+                        </li>
+                        <li>
+                            <a href="#" id = "baddiv" onclick = "redirects(this.id);"><i class="fa fa-dashboard fa-fw"></i> Bad bots</a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- /.sidebar-collapse -->
+            </div>
+            <!-- /.navbar-static-side -->
+        </nav>
+
+        <div id="page-wrapper">
+            <div class="row">
+                <div class="col-lg-12">
+                   	<h1 class="page-header">Dashboard</h1>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+            <br/>
+            <!-- row: last-month -->
+            <div class="row" id="last-month">
+                <div class="col-lg-3 col-md-6">
+                    <div class="panel panel-green">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-bolt fa-5x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div class="huge">{{good_ips_range}}</div>
+                                    <div>Good Bots</div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="#" id = "gooddiv" onclick = "redirects(this.id);">
+                            <div class="panel-footer">
+                                <span class="pull-left">View Details</span>
+                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                <div class="clearfix"></div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+               
+                <div class="col-lg-3 col-md-6">
+                    <div class="panel panel-yellow">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-warning fa-5x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div class="huge">{{suspicious_ips_range}}</div>
+                                    <div>Suspicious</div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="#" id = "suspiciousdiv" onclick = "redirects(this.id);">
+                            <div class="panel-footer">
+                                <span class="pull-left">View Details</span>
+                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                <div class="clearfix"></div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="panel panel-red">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-support fa-5x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div class="huge">{{bad_ips_range}}</div>
+                                    <div>Bad Bots!</div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="#" id = "baddiv" onclick = "redirects(this.id);" >
+                            <div class="panel-footer">
+                                <span class="pull-left">View Details</span>
+                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                <div class="clearfix"></div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                 <div class="col-lg-3 col-md-6">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-tasks fa-5x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div class="huge">{{hits_in_range}}</div>
+                                    <div>Total hits in range</div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="#">
+                            <div class="panel-footer">
+                                <span class="pull-left">Distinct ips hits<br></span>
+                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                <span class="pull-right"></span>
+                                <div class="clearfix"></div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+            <!-- <div class="row" style="display: none;">
+                <div class="col-lg-3 col-md-6"> -->
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                Line Chart Example
+                            </div>
+                            <!-- /.panel-heading -->
+                            <div class="panel-body">
+                                <div id="morris-line-chart"></div>
+                            </div>
+                            <!-- /.panel-body -->
+                        </div>
+                        <!-- /.panel -->
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <i class="fa fa-bar-chart-o fa-fw"></i><strong> Bot Classification this month</strong>
+                            </div>
+                            <div class="panel-body">
+                                <div id="morris-donut-chart"></div>
+                                <!-- <a href="#" class="btn btn-default btn-block">View Details</a> -->
+                            </div>
+                                <!-- /.panel-body -->
+                    </div>
+                </div>
+            </div>    
+                        <div class="panel-footer">
+
+                            <div class="input-group">
+                                
+                            </div>
+                        </div>
+                        <!-- /.panel-footer -->
+                    </div>
+                    <!-- /.panel .chat-panel -->
+                </div>
+                <!-- /.col-lg-4 -->
+            </div>
+            <!-- /.row -->
+
+
+        </div>
+        <!-- /#page-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+    
+    <!-- jQuery -->
+    {% load staticfiles %}
+    <script type="text/javascript">
+        function redirects(idz){
+            var vars = [], hash;
+
+            var date = new Date()
+            var today = date.getDate()
+            var month = date.getMonth() + 1
+            var year = date.getFullYear()
+            if(month<10) {
+                month = '0' + month 
+            }
+            else {
+                month = '1' + month
+            }
+            var fullDateInitial = year + '-'+month + '-01'
+            var fullDateToday = year + '-'+ month + '-' + today
+            var st = fullDateInitial
+            var et = fullDateToday
+
+            var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+            for (var i = 0; i < hashes.length; i++) {
+                hash = hashes[i].split('=');
+                vars.push(hash[1]);
+                vars[hash[1]] = hash[1];
+            }
+            if(vars!=''){
+                st = vars[0];
+                et = vars[1];
+            }
+    
+            if(idz == 'baddiv'){
+                window.location = "http://127.0.0.1:8000/readlog/4/bad_ip_tables/?start="+st+"&end="+et;
+            }
+
+            else if(idz == 'suspiciousdiv'){
+                window.location = "http://127.0.0.1:8000/readlog/4/suspicious_ip_tables/?start="+st+"&end="+et;
+            }
+            else if(idz == 'gooddiv'){
+                window.location = "http://127.0.0.1:8000/readlog/4/good_bot_tables/?start="+st+"&end="+et;
+            }
+            else if(idz == 'dashdiv'){
+                window.location = "http://127.0.0.1:8000/readlog/?start="+st+"&end="+et;
+            }
+            
+        }
+    </script>
+
+     <!-- date picker custom js --> 
+    <script type="text/javascript">
+    	var date = new Date()
+    	var today = date.getDate()
+    	var month = date.getMonth() + 1
+    	var year = date.getFullYear()
+    	if(month<10) {
+    		month = '0' + month 
+    	}
+    	else {
+    		month = '1' + month
+    	}
+    	var fullDateInitial = month + '/01/' + year
+    	var fullDateToday = month + '/' +  today +'/' + year
+    	//window.alert(fullDateToday)
+    	var vars = [], hash;
+	    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+	    for (var i = 0; i < hashes.length; i++) {
+	        hash = hashes[i].split('=');
+	        vars.push(hash[1]);
+	        vars[hash[1]] = hash[1];
+	    }
+	    var st = fullDateInitial
+	    var et = fullDateToday
+	    
+	    if (vars != ''){
+        		st=new Date(vars[0]),
+            	et=new Date(vars[1]);
+        }
+ 		
+        $('#config-demo').daterangepicker({
+        	
+        	"startDate": st,
+        	"endDate": et
+        }, function(start, end, label) {
+          /*console.log("New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')");*/
+          console.log("Here");
+          window.location.replace("http://127.0.0.1:8000/readlog/?start="+start.format('YYYY-MM-DD')+"&end="+end.format('YYYY-MM-DD'));
+        });
+    </script>  
+    <!-- date picker custom js ends here-->
+   
+
+
+
+
+    <script src="{% static 'readlog/bower_components/jquery/dist/jquery.min.js' %}"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="{% static 'readlog/bower_components/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+
+
+    <script type="text/javascript">
+       function toggle_visibility(){
+            if(document.getElementById("projectKey").value == 'Yesterday'){
+                document.getElementById('last-hour').style.display= 'none';
+                document.getElementById('yesterday').style.display= 'block'
+                document.getElementById('last-week').style.display= 'none';
+                document.getElementById('last-month').style.display= 'none';
+            }
+            else if(document.getElementById("projectKey").value == 'Last hour'){
+                document.getElementById('yesterday').style.display= 'none';
+                document.getElementById('last-hour').style.display= 'block';   
+                document.getElementById('last-week').style.display= 'none';
+                document.getElementById('last-month').style.display= 'none';
+                
+            }
+
+            else if(document.getElementById("projectKey").value == 'Last Week'){
+                document.getElementById('last-hour').style.display= 'none';
+                document.getElementById('yesterday').style.display= 'none'
+                document.getElementById('last-week').style.display= 'block';
+                document.getElementById('last-month').style.display= 'none';
+            }
+            else if(document.getElementById("projectKey").value == 'Last Month'){
+                document.getElementById('yesterday').style.display= 'none';
+                document.getElementById('last-hour').style.display= 'none';   
+                document.getElementById('last-week').style.display= 'none';
+                document.getElementById('last-month').style.display= 'block';
+                
+            }
+        }
+    </script>
+    <script type="text/javascript">
+        var d = new Date();
+        var month = new Array();
+        month[0] = "01";
+        month[1] = "02";
+        month[2] = "03";
+        month[3] = "04";
+        month[4] = "05";
+        month[5] = "06";
+        month[6] = "07";
+        month[7] = "08";
+        month[8] = "09";
+        month[9] = "10";
+        month[10] = "11";
+        month[11] = "12";
+        var n = month[d.getMonth()];
+        var m = '2015'
+        var dates = new Array();
+
+        dates[1] = m + '-' + n + '-' + '05'
+        dates[2] = m + '-' + n + '-' + '10'
+        dates[3] = m + '-' + n + '-' + '15'
+        dates[4] = m + '-' + n + '-' + '20'
+        dates[5] = m + '-' + n + '-' + '25'
+        dates[6] = m + '-' + n + '-' + '30' 
+
+        Morris.Line({
+          element: 'morris-line-chart',
+          data: [
+            { y: dates[1], a: {{bad_bots_first}},  b: {{good_bots_first}} },
+            { y: dates[2], a: {{bad_bots_ten}},  b: {{good_bots_ten}} },
+            { y: dates[3], a: {{bad_bots_15}},  b: {{good_bots_15}} },
+            { y: dates[4], a: {{bad_bots_20}},  b: {{good_bots_20}} },
+            { y: dates[5], a: {{bad_bots_25}},  b: {{good_bots_25}} },
+            { y: dates[6], a: {{bad_bots_30}}, b: {{good_bots_30}} }
+          ],
+          xkey: 'y',
+          ykeys: ['a', 'b'],
+          labels: ['Bad bots', 'Good bots'],
+          xLabelFormat: function (x) {
+                  var IndexToMonth = [ "Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez" ];
+                  var month = IndexToMonth[ x.getMonth() ];
+                  var year = x.getFullYear();
+                  var date = x.getDate();
+                  return year + ' ' + month + ' ' + date;
+              },
+          dateFormat: function (x) {
+                  var IndexToMonth = [ "Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez" ];
+                  var month = IndexToMonth[ new Date(x).getMonth() ];
+                  var year = new Date(x).getFullYear();
+                  var date = new Date(x).getDate();
+                  return year + ' ' + month + ' ' + date;
+              },
+        });
+    </script>
+    <script type="text/javascript">
+        Morris.Donut({
+          element: 'morris-donut-chart',
+          data: [{
+            label: "Good Bots",
+            value: {{good_ips_range}}
+          }, {
+            label: "Bad Bots",
+            value: {{bad_ips_range}}
+          }, {
+            label: "Suspicious Bots",
+            value: {{suspicious_ips_range}}
+          }]
+        });
+    </script>
+
+    <script type="text/javascript">
+        setTimeout(function(){
+           window.location.reload(1);
+        }, 4000000);
+    </script>
+    {% else %}
+    <script type="text/javascript">
+        window.location = "/readlog/login/";
+    </script>
+    {% endif %}
 </body>
+
 </html>
