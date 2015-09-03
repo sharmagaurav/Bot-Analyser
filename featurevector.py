@@ -1,5 +1,6 @@
 #! /usr/bin/env python
-import MySQLdb
+import pymysql
+import pymysql.cursors
 import re
 from datetime import datetime
 import time
@@ -53,7 +54,7 @@ t=['readlog_badbotsip', 'readlog_goodbots', 'readlog_suspicious']
 
 def extract_hosts():
 
-	conn = MySQLdb.connect(host = "localhost", user = "root",
+	conn = pymysql.connect(host = "localhost", user = "root",
                             passwd = "1234", db = "logparsers")
 	cursor = conn.cursor()
 
@@ -114,7 +115,7 @@ def extract_hosts():
 
 
 def get_training_centroids():
-	conn = MySQLdb.connect(host = "localhost", user = "root",
+	conn = pymysql.connect(host = "localhost", user = "root",
 							passwd = "1234", db = "logparsers")
 
 	cursor        = conn.cursor()
@@ -123,13 +124,14 @@ def get_training_centroids():
 	for i in range(len(des)):
 		cursor.execute("SELECT count,centroid1, centroid2, centroid3, deviation, distance from readlog_training_centroids where description = %s", (des[i]))
 		data = cursor.fetchall()
-		print data[0][0], data[0][1], data[0][2]
+		#print data[0][0], data[0][1], data[0][2]
+		print data
 		count.append(data[0][0])
 		centroid1.append(data[0][1])
 		centroid2.append(data[0][2])
 		centroid3.append(data[0][3])
 		dev = data[0][4]
-		dev = dev*pow(10,13)
+		#dev = dev*pow(10,13)
 		deviation.append(dev)
 		mean_distance.append(data[0][5])
 
@@ -161,7 +163,7 @@ def get_training_centroids():
 
 def feature2():
 	print "entered feature2"
-	conn = MySQLdb.connect(host = "localhost", user = "root",
+	conn = pymysql.connect(host = "localhost", user = "root",
                             passwd = "1234", db = "logparsers")
 	cursor = conn.cursor()
 
@@ -186,7 +188,7 @@ def feature3():
 	avg_hits_per_session = [0.0]*len(host_list)
 	avg_time_between_two_requests = [0.0]*len(host_list)
 
-	conn = MySQLdb.connect(host = "localhost", user = "root",
+	conn = pymysql.connect(host = "localhost", user = "root",
                             passwd = "1234", db = "logparsers")
 	cursor = conn.cursor()
 
@@ -305,7 +307,7 @@ def feature3():
 
 
 def feature6():
-	conn = MySQLdb.connect(host = "localhost", user = "root",
+	conn = pymysql.connect(host = "localhost", user = "root",
 							passwd = "1234", db = "logparsers")
 
 	cursor = conn.cursor()
@@ -368,7 +370,7 @@ def feature6():
 def insert_db():
 
 	print "entered db"
-	conn = MySQLdb.connect(host = "localhost", user = "root",
+	conn = pymysql.connect(host = "localhost", user = "root",
                             passwd = "1234", db = "logparsers")
 	cursor = conn.cursor()
 	l=len(host_list)
@@ -439,7 +441,7 @@ def cal_distance():
 		
 def insert_test():
 
-	conn = MySQLdb.connect(host = "localhost", user = "root",
+	conn = pymysql.connect(host = "localhost", user = "root",
 							passwd = "1234", db = "logparsers")
 	cursor = conn.cursor()
 
@@ -477,7 +479,7 @@ def insert_test():
 
 def cal_centroid():
 
-	conn = MySQLdb.connect(host = "localhost", user = "root",
+	conn = pymysql.connect(host = "localhost", user = "root",
 							passwd = "1234", db = "logparsers")
 	cursor = conn.cursor()
 	# count = [10,20,30]
@@ -601,7 +603,7 @@ def cal_centroid():
 def insert_new_values():
 
 	print "entered insrt insert_new_values"
-	conn = MySQLdb.connect(host = "localhost", user = "root",
+	conn = pymysql.connect(host = "localhost", user = "root",
                             passwd = "1234", db = "logparsers")
 	cursor = conn.cursor()
 
@@ -611,7 +613,7 @@ def insert_new_values():
 	conn.commit()
 
 def lll():
-	conn = MySQLdb.connect(host = "localhost", user = "root",
+	conn = pymysql.connect(host = "localhost", user = "root",
                             passwd = "1234", db = "logparsers")
 	cursor = conn.cursor()
 
