@@ -1,9 +1,8 @@
-#! /usr/bin/env python
-import os
-import subprocess
+	#! /usr/bin/env python
 import re
-import MySQLdb
-from subprocess import Popen, PIPE, STDOUT
+import os
+import pymysql
+import pymysql.cursors
 from datetime import datetime
 import time
 
@@ -30,7 +29,7 @@ def bulk_insert_logs_2(host_list,client_id_list,user_id_list,
 			response_code_list,content_size_list,user_agents_list,
 			mobile_list,user_agent_flag_list,section_list,left):
 	
-	conn = MySQLdb.connect(host = "localhost", user = "root",
+	conn = pymysql.connect(host = "localhost", user = "root",
 							passwd = "1234", db = "logparsers")
 
 	cursor = conn.cursor()
@@ -48,7 +47,7 @@ def bulk_insert_logs(host_list,client_id_list,user_id_list,
 			response_code_list,content_size_list,user_agents_list,
 			mobile_list,user_agent_flag_list,section_list):
 	
-	conn = MySQLdb.connect(host = "localhost", user = "root",
+	conn = pymysql.connect(host = "localhost", user = "root",
 							passwd = "1234", db = "logparsers")
 
 	cursor = conn.cursor()
@@ -69,165 +68,33 @@ def preliminary_test():
 	This evaluates whether the request contains a user agent
 	or not. 
 	"""
-	conn = MySQLdb.connect(host = "localhost", user = "root",
+	conn = pymysql.connect(host = "localhost", user = "root",
                             passwd = "1234", db = "logparsers")
 	cursor = conn.cursor()
 	p = "-"
 	description_bad_ip = 'Empty user agent'
-	description_good_ip = 'Ajax requests'
-	cursor.execute("SELECT distinct(host), date_time from readlog_logconfig_test  where user_agents like %s group by host",(p))
+	
+	cursor.execute("SELECT distinct(host), date_time, count(*) from readlog_logconfig_test  where user_agents like %s group by host",(p))
 
 	data = cursor.fetchall()
-	count = 0
-	temp = []
-	for row in data:
-		ip = data[count]
-		temp.append(ip)
-		count+=1
+	
 
-	print len(temp)
-	for i in range(len(temp)):
-		cursor.execute("SELECT count(*) from readlog_logconfig_test where host = %s",temp[i][0])
-		c1 = cursor.fetchall()
-		hits = c1[0][0]
-		# print i+1, ": ", hits
-		cursor.execute("INSERT INTO readlog_badbotsip_test (host, Description, date_time, hits) VALUES (%s,%s,%s,%s) ON DUPLICATE KEY UPDATE host = %s, Description = %s, date_time = %s, hits = %s",(str(temp[i][0]), description_bad_ip, temp[i][1], hits,str(temp[i][0]), description_bad_ip, temp[i][1], hits))
+	print len(data)
+
+	for i in range(len(data)):
+		ip = data[i][0]
+		datetime = data[i][1]
+		hits = data[i][2]
+		cursor.execute("INSERT INTO readlog_badbotsip_test (host, Description, date_time, hits) VALUES (%s,%s,%s,%s) ON DUPLICATE KEY UPDATE host = %s, Description = %s, date_time = %s, hits = %s",(str(ip), description_bad_ip, datetime, hits,str(ip), description_bad_ip, datetime, hits))
 
 	local_host = '127.0.0.1'
-	cursor.execute("delete from readlog_badbotsip_test where host = %s",(local_host))
-	conn.commit()
+	# cursor.execute("delete from readlog_badbotsip_test where host = %s",(local_host))
+	# conn.commit()
 	print "Preliminary test done."
-
-
-def excess_requests_in_recent_past():
-
-	conn = MySQLdb.connect(host = "localhost", user = "root",
-                            passwd = "1234", db = "logparsers")
-	cursor = conn.cursor()
-
-	cursor.execute("SELECT distinct(host) from readlog_badbotsip_test")
-	data = cursor.fetchall()
-	b = set(data)
-	x = list(b)
-	xx = []
-	for i in range(len(x)):
-		xx.append(x[i][0])
-
-
-	cursor.execute("SELECT distinct(host) from readlog_goodbots_test")
-	data = cursor.fetchall()
-	g = set(data)
-	y = list(g)
-	yy = []
-
-	for i in range(len(y)):
-		yy.append(y[i][0])
-
-
-	# cursor.execute("SELECT distinct(host) from readlog_goodusers_test")
-	# data = cursor.fetchall()
-	# u = set(data)
-	# z = list(u)
-	# zz = []
-
-	# for i in range(len(z)):
-	# 	zz.append(z[i][0])
-	
-	cursor.execute("SELECT host, count(*) as c from readlog_logconfig_test group by host order by c desc limit 2000")
-	data = cursor.fetchall()
-	t = set(data)
-	w = list(t)
-	s = []
-	
-	for i in range(len(w)):
-		s.append(w[i][0])
-
-	ff = set(xx)|set(yy)
-	#print len(xx),"+",len(yy),"+",len(zz),"=",len(ff)
-
-	fff = set(s) & set(ff)
-	#print len(fff)
-
-	ffff = set(s) - set(fff)
-
-	#print len(ffff)
-
-	distinct_host_list = list(ffff)
-	#print distinct_host_list[0]
-	print "Distinct hosts : ",len(distinct_host_list)
-
-	suspicious_ip = []
-	host_ip_count = []
-
-	dts_list = []
-	for i in range(len(distinct_host_list)):
-		host_ip = str(distinct_host_list[i])
-		cursor.execute("SELECT max(date_time) from readlog_logconfig_test_dump where host = %s",(distinct_host_list[i]))
-		
-		data = cursor.fetchone()
-		y = data[0]
-		x = str(data[0])
-		p = x.split()
-		pre = datetime.strptime(p[1],"%H:%M:%S")
-		sub = datetime.strptime("01:00","%M:%S")
-		dif = pre-sub
-		dif = str(dif)
-		final = p[0] + 	" " + dif
-		
-		cursor.execute("SELECT host, count(*) as c from readlog_logconfig_test_dump where host = %s and date_time > %s",(host_ip, final))
-		p1 = cursor.fetchall()
-
-		if(p1[0][1]>=30):	
-			crumb = host_ip
-			suspicious_ip.append(crumb)
-			dts_list.append(y)
-			cursor.execute("SELECT count(*) from readlog_logconfig_test_dump where host = %s",host_ip)
-			hits_data = cursor.fetchall()
-			host_ip_count.append(hits_data[0][0])
-			# if(crumb == '180.215.181.46'):
-			# 	print final, " ", crumb, " ", hits_data[0][0]
-
-	
-	print "Suspicious ips: ",len(suspicious_ip)
-	sus_ffff = set(suspicious_ip)
-
-	for i in range(len(suspicious_ip)):
-		cursor.execute("INSERT INTO readlog_suspicious_test (host, Description, date_time, hits) VALUES (%s,%s,%s,%s) ON DUPLICATE KEY UPDATE host = %s, Description = %s, date_time = %s, hits = %s",(suspicious_ip[i], "Excess access in one minute", dts_list[i], host_ip_count[i],suspicious_ip[i], "Excess access in one minute", dts_list[i], host_ip_count[i]))
-
-	fin = set(ffff) - set(sus_ffff)
-	left_ips = list(fin)
-
-	des_sus = "Excess hits in a day"
-	new_sus = []
-	new_sus_date = []
-	new_sus_hits = []
-
-	for l in range(len(left_ips)):
-		cursor.execute("SELECT host, max(date_time), count(*) as c from readlog_logconfig_test where host = %s having c > 200",(left_ips[l]))
-		exc = cursor.fetchall()
-		if(len(exc)>=1):
-			print exc[0][0], " ", exc[0][1], " ", exc[0][2]
-			new_sus.append(exc[0][0])
-			new_sus_date.append(exc[0][1])
-			new_sus_hits.append(exc[0][2])
-
-	for i in range(len(new_sus)):
-		cursor.execute("INSERT INTO readlog_suspicious_test (host, Description, date_time, hits) VALUES (%s,%s,%s,%s) ON DUPLICATE KEY UPDATE host = %s, Description = %s, date_time = %s, hits = %s",(new_sus[i], "Excess access in one day", new_sus_date[i], new_sus_hits[i],new_sus[i], "Excess access in one minute", new_sus_date[i], new_sus_hits[i]))
-
-	local_host = '127.0.0.1'
-	cursor.execute("delete from readlog_suspicious_test where host = %s",(local_host))
-
-	conn.commit()
-
-
-
-	print "Excess access done."
-
-
 
 def botAndIp():
 
-	conn = MySQLdb.connect(host = "localhost", user = "root",
+	conn = pymysql.connect(host = "localhost", user = "root",
 							passwd = "1234", db = "logparsers")
 
 	cursor = conn.cursor()
@@ -270,9 +137,10 @@ def botAndIp():
 	conn.commit()
 	print "Good bots done"
 
+
 def scrappers():
 
-	conn = MySQLdb.connect(host = "localhost", user = "root",
+	conn = pymysql.connect(host = "localhost", user = "root",
 							passwd = "1234", db = "logparsers")
 
 	cursor = conn.cursor()
@@ -280,44 +148,42 @@ def scrappers():
 
 	a1='Offline Explorer|SiteSnagger|WebCopier|WebReaper|WebStripper|WebZIP|TeleportPro|Xaldon_WebSpider'
 	#a = 'Offline Explorer'	
-	a = ['Offline Explorer','qwant','Grapeshot','DotBot','OrangeBot','CrystalSemanticsBot','rogerbot','GarlikCrawler','MojeekBot']
+	a = ['%Offline Explorer%','%qwant%','%Grapeshot%','%DotBot%','%OrangeBot%','%CrystalSemanticsBot%','%rogerbot%','%GarlikCrawler%','%MojeekBot%']
 
 	for x in range(len(a)):
 
-		cursor.execute("select distinct(host), user_agents, date_time from readlog_logconfig_test where user_agents REGEXP %s group by host",(a[x]))
+		cursor.execute("select distinct(host), user_agents, date_time, count(*) from readlog_logconfig_test where user_agents LIKE %s group by host",(a[x]))
 		data= cursor.fetchall()
 		print a[x], " ", len(data)," \n"
 		for i in range(len(data)):
 			ips = str(data[i][0])
 			print ips
-			# scr = str(data[i][1])
 			scr = a[x]
 			print "Description: ",scr
 			dts = data[i][2]
 			des = scr + " Scrapper"
-
-
-			cursor.execute("SELECT count(*) from readlog_logconfig_test_dump where host = %s",ips)
-			c1 = cursor.fetchall()
-			hits = c1[0][0]
+			hits = data[i][3]
 
 			cursor.execute("INSERT INTO readlog_badbotsip_test (host, Description, date_time, hits) VALUES (%s,%s,%s,%s) ON DUPLICATE KEY UPDATE host = %s, Description = %s, date_time = %s, hits = %s",(ips,des,dts, hits,ips,des,dts, hits))
 
 	conn.commit()
 	print "Scrappers found"
 
+
 def badbot_agents():
 
-	conn = MySQLdb.connect(host = "localhost", user = "root",
+	conn = pymysql.connect(host = "localhost", user = "root",
 							passwd = "1234", db = "logparsers")
 
 	cursor = conn.cursor()
 
-	b = ['MJ12bot','ExaBot','ia_archiver','nutch','AhrefsBot','Python-urllib','oBot','wget','UniversalFeedParser','DigExt','curl','unknown','python-requests','spbot','Java/1.','newrelic']
+	#b = ['MJ12bot','ia_archiver|nutch|AhrefsBot','Python-urllib|oBot','UniversalFeedParser|DigExt']
+	#b = ['MJ12bot|ExaBot','ia_archiver|nutch|AhrefsBot','Python-urllib|oBot|wget','UniversalFeedParser|DigExt|curl','unknown|python-requests']
+	b = ['%MJ12bot%','%ExaBot%','%ia_archiver%','%nutch%','%AhrefsBot%','%Python-urllib%','%oBot%','%wget%','%UniversalFeedParser%','%DigExt%','%curl%','%unknown%','%python-requests%','%spbot%','%Java/1.%','%newrelic%']
 	print "len ",len(b)
 	gg = set()
 	for i in range(len(b)):
-		cursor.execute("select distinct(host), date_time from readlog_logconfig_test where user_agents REGEXP %s group by host",(b[i]))
+		cursor.execute("select distinct(host), date_time, count(*) from readlog_logconfig_test where user_agents LIKE %s group by host",(b[i]))
 		data= cursor.fetchall()
 		
 		print b[i]," : ",len(data)
@@ -326,14 +192,127 @@ def badbot_agents():
 			scr = b[i]
 			dts = data[x][1]
 			des = str(scr)
-
-			cursor.execute("SELECT count(*) from readlog_logconfig_test_dump where host = %s",ips)
-			c1 = cursor.fetchall()
-			hits = c1[0][0]
-
+			hits = data[x][2]
+			# cursor.execute("SELECT count(*) from readlog_logconfig_test_dump where host = %s",ips)
+			# c1 = cursor.fetchall()
 			cursor.execute("INSERT INTO readlog_badbotsip_test (host, Description, date_time, hits) VALUES (%s,%s,%s,%s) ON DUPLICATE KEY UPDATE host = %s, Description = %s, date_time = %s, hits = %s",(ips,des,dts,hits,ips,des,dts,hits))
-			print ips
+		
 	conn.commit()
+
+def excess_requests_in_recent_past():
+
+	conn = pymysql.connect(host = "localhost", user = "root",
+                            passwd = "1234", db = "logparsers")
+	cursor = conn.cursor()
+
+	cursor.execute("SELECT distinct(host) from readlog_badbotsip_test")
+	data = cursor.fetchall()
+	# b = set(data)
+	# x = list(b)
+	xx = []
+	for i in range(len(data)):
+		xx.append(data[i][0])
+
+
+	cursor.execute("SELECT distinct(host) from readlog_goodbots_test")
+	data = cursor.fetchall()
+	# g = set(data)
+	# y = list(g)
+	yy = []
+
+	for i in range(len(data)):
+		yy.append(data[i][0])
+
+	cursor.execute("SELECT host, count(*) as c from readlog_logconfig_test group by host order by c desc limit 2000")
+	data = cursor.fetchall()
+	# t = set(data)
+	# w = list(t)
+	s = []
+	
+	for i in range(len(data)):
+		s.append(data[i][0])
+
+	ff = set(xx)|set(yy)
+	#print len(xx),"+",len(yy),"+",len(zz),"=",len(ff)
+
+	fff = set(s) & set(ff)
+	#print len(fff)
+
+	ffff = set(s) - set(fff)
+
+	#print len(ffff)
+
+	distinct_host_list = list(ffff)
+	#print distinct_host_list[0]
+	print "Distinct hosts : ",len(distinct_host_list)
+
+	suspicious_ip = []
+	host_ip_count = []
+
+	dts_list = []
+	for i in range(len(distinct_host_list)):
+		host_ip = str(distinct_host_list[i])
+		cursor.execute("SELECT max(date_time) from readlog_logconfig_test where host = %s",(distinct_host_list[i]))
+		
+		data = cursor.fetchone()
+		y = data[0]
+		x = str(data[0])
+		p = x.split()
+		pre = datetime.strptime(p[1],"%H:%M:%S")
+		sub = datetime.strptime("01:00","%M:%S")
+		dif = pre-sub
+		dif = str(dif)
+		final = p[0] + 	" " + dif
+		
+		cursor.execute("SELECT host, count(*) as c from readlog_logconfig_test where host = %s and date_time > %s",(host_ip, final))
+		p1 = cursor.fetchall()
+
+		if(p1[0][1]>=30):	
+			crumb = host_ip
+			suspicious_ip.append(crumb)
+			dts_list.append(y)
+			cursor.execute("SELECT count(*) from readlog_logconfig_test where host = %s",host_ip)
+			hits_data = cursor.fetchall()
+			host_ip_count.append(hits_data[0][0])
+			# if(crumb == '180.215.181.46'):
+			# 	print final, " ", crumb, " ", hits_data[0][0]
+
+	
+	print "Suspicious ips: ",len(suspicious_ip)
+	sus_ffff = set(suspicious_ip)
+	print sus_ffff
+
+	for i in range(len(suspicious_ip)):
+		cursor.execute("INSERT INTO readlog_suspicious_test (host, Description, date_time, hits) VALUES (%s,%s,%s,%s) ON DUPLICATE KEY UPDATE host = %s, Description = %s, date_time = %s, hits = %s",(suspicious_ip[i], "Excess access in one minute", dts_list[i], host_ip_count[i],suspicious_ip[i], "Excess access in one minute", dts_list[i], host_ip_count[i]))
+
+	fin = set(ffff) - set(sus_ffff)
+	left_ips = list(fin)
+
+	des_sus = "Excess hits in a day"
+	new_sus = []
+	new_sus_date = []
+	
+	new_sus_hits = []
+
+	for l in range(len(left_ips)):
+		cursor.execute("SELECT host, max(date_time), count(*) as c from readlog_logconfig_test where host = %s having c > 200",(left_ips[l]))
+		exc = cursor.fetchall()
+		if(len(exc)>=1):
+			print exc[0][0], " ", exc[0][1], " ", exc[0][2]
+			new_sus.append(exc[0][0])
+			new_sus_date.append(exc[0][1])
+			new_sus_hits.append(exc[0][2])
+
+	for i in range(len(new_sus)):
+		cursor.execute("INSERT INTO readlog_suspicious_test (host, Description, date_time, hits) VALUES (%s,%s,%s,%s) ON DUPLICATE KEY UPDATE host = %s, Description = %s, date_time = %s, hits = %s",(new_sus[i], "Excess access in one day", new_sus_date[i], new_sus_hits[i],new_sus[i], "Excess access in one minute", new_sus_date[i], new_sus_hits[i]))
+
+	# local_host = '127.0.0.1'
+	# cursor.execute("delete from readlog_suspicious_test where host = %s",(local_host))
+
+	conn.commit()
+
+	print "Excess access done."
+
 
 def check():
 	
@@ -508,22 +487,6 @@ def read_at_runtime():
 	print "done"
 	f.close()
 	check()
-	# if(sum_count_temp<sum_counts):
-	# 	conn = MySQLdb.connect(host = "localhost", user = "root",
-	# 				passwd = "1234", db = "logparsers")
-
-	# 	cursor = conn.cursor()
-
-	# 	cursor.execute("TRUNCATE table readlog_logconfig_test")
-	# 	conn.commit()
-
-
-	# f = open(path+"/fi.txt",'a')
-
-	# for i in range(len(text)):
-	# 	#print text[i]
-	# 	f.write(text[i])
-	# f.write("\n")
 
 	f = open(path + "/pointer.conf",'w')
 	f.write(pointer_new)
