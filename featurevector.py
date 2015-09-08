@@ -597,20 +597,19 @@ def cal_centroid():
 
 	for i in range(3):	
 		cursor.execute("UPDATE readlog_training_centroids set count = %s,centroid1 = %s, centroid2 = %s, centroid3 = %s, distance = %s where id = %s", (count[i],new_centroid1[i],new_centroid2[i],new_centroid3[i],new_mean_distance[i],i+1))	
-		
  	conn.commit()
 
-def insert_new_values():
+# def insert_new_values():
 
-	print "entered insrt insert_new_values"
-	conn = pymysql.connect(host = "localhost", user = "root",
-                            passwd = "1234", db = "logparsers")
-	cursor = conn.cursor()
+# 	print "entered insrt insert_new_values"
+# 	conn = pymysql.connect(host = "localhost", user = "root",
+#                             passwd = "1234", db = "logparsers")
+# 	cursor = conn.cursor()
 
-	for i in range(3):	
-		cursor.execute("UPDATE readlog_training_centroids set count = %s,centroid1 = %s, centroid2 = %s, centroid3 = %s, distance = %s)" %(count[i],new_centroid1[i],new_centroid2[i],new_centroid3[i],new_mean_distance[i]))	
+# 	for i in range(3):	
+# 		cursor.execute("UPDATE readlog_training_centroids set count = %s,centroid1 = %s, centroid2 = %s, centroid3 = %s, distance = %s where id = %s)",(count[i],new_centroid1[i],new_centroid2[i],new_centroid3[i],new_mean_distance[i], i+1))	
 		
-	conn.commit()
+# 	conn.commit()
 
 def lll():
 	conn = pymysql.connect(host = "localhost", user = "root",
@@ -679,5 +678,5 @@ if __name__ == '__main__':
 	cal_distance()
 	insert_test()
 	cal_centroid()
-	insert_new`_values()
+	#insert_new_values()
 	#lll()
